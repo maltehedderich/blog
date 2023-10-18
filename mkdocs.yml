@@ -1,0 +1,7 @@
+site_name: Malte Hedderich
+theme:
+  name: material
+  palette:
+    scheme: slate
+  features:
+    - header.autohide
