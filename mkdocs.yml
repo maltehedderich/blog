@@ -5,3 +5,5 @@ theme:
     scheme: slate
   features:
     - header.autohide
+nav:
+  - Home: index.md
