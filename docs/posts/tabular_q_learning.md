@@ -11,7 +11,9 @@ draft: true
 
 ## Introduction
 
-This blog post delves into the topic of Tabular Q-Learning, a specific type of Q-Learning. We will explore other variants, such as Deep Q-Learning, in subsequent posts. Q-Learning is used in various applications like game playing, robot navigation, in economics and trade, and many more. It's particularly useful when the problem model is not known i.e., when the outcomes for actions are not predictable.
+This blog post delves into the topic of Tabular Q-Learning, a specific type of Q-Learning. Q-Learning is used in various applications like game playing, robot navigation, in economics and trade, and many more. It's particularly useful when the problem model is not known i.e., when the outcomes for actions are not predictable.
+
+<!-- more -->
 
 Q-Learning is a `reinforcement learning` algorithm, to identify the best action-selection policy using a Q-function. Reinforcement learning is a subset of machine learning where an agent learns to make decisions by taking actions in an environment to maximize some type of reward. Q-Learning is a `model-free` algorithm, meaning it doesn't need a model of the environment to learn.
 

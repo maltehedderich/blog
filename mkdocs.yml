@@ -12,6 +12,7 @@ plugins:
   - blog:
       blog_dir: .
       blog_toc: true
+      post_excerpt: required
   - tags
 
 extra_javascript:
