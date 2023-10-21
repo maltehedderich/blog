@@ -6,3 +6,7 @@ theme:
   favicon: images/favicon/favicon-192.png
   features:
     - header.autohide
+plugins:
+  - blog:
+      blog_dir: .
+      blog_toc: true
