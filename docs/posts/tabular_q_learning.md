@@ -21,67 +21,60 @@ By continuously updating the Q-function, the algorithm enables us to create a ta
 
 ## Prerequisites
 
-To follow along with this blog post, you should have a basic understanding of Reinforcement Learning. If you are new to Reinforcement Learning, I would recommend you to check out this [blog post](https://towardsdatascience.com/reinforcement-learning-101-e24b50e1d292).
-
-Furthermore, if you want to follow along with the code, you should have a basic understanding of Python. We will use the following libraries in this blog post:
+For the code examples, we will use Python 3.11. The code is available in a [Jupyter Notebook](https://github.com/maltehedderich/blog/blob/main/notebooks/tabular_q_learning.ipynb). The following libraries are required:
 
 - [Gym](https://gym.openai.com/) - OpenAI Gym is a toolkit for developing and comparing reinforcement learning algorithms.
 - [NumPy](https://numpy.org/) - NumPy is a library for the Python programming language, adding support for large, multi-dimensional arrays and matrices, along with a large collection of high-level mathematical functions to operate on these arrays.
 
-## Understanding Q-Learning
-
-### Algorithm
+## Q-Learning - The Algorithm
 
 **1. Initialize the Q-table with zeros.**
-To initialize the Q-table, we need to know the number of states and actions. Let's consider a simple game of tic-tac-toe.
+The Q-table initialization requires knowledge of the number of states and actions. For instance, in a simple game of tic-tac-toe, the states represent the various possible configurations of the tic-tac-toe board. Given that the board is a 3x3 grid with each cell capable of being empty, X, or O, there are $3^9 = 19.683$ potential states.
 
-In this game, the states would be the different possible configurations of the tic-tac-toe board. Since the board is a 3x3 grid and each cell can be in one of three states (empty, X, or O), there are 3^9 = 19,683 possible states.
-
-The actions would be the different possible moves a player can make. In any given state, a player can place their mark in any empty cell. So, the number of actions in any given state can range from 1 (if there's only one empty cell left) to 9 (if the board is empty).
+The actions, on the other hand, represent the various moves a player can make. Depending on the state, a player can place their mark in any empty cell. Therefore, the number of actions per state can vary from 1 (if only one empty cell remains) to 9 (if the board is empty).
 
 **2. Explore the environment by taking a random action.**
-In the beginning, we don't know which action is the best action to take in a given state. So, we take a random action and observe the reward and the next state. We then update the Q-table using the Bellman Equation.
+Initially, the best action to take in a given state is unknown. Therefore, a random action is taken, and the reward and subsequent state are observed. The Q-table is then updated using the Bellman Equation.
 
-We have to balance `exploration` (taking random actions) and `exploitation` (taking the best action). We do this by using an `exploration rate`. The exploration rate is the probability that the agent will explore the environment by taking a random action. The exploration rate is initialized to 1, meaning that the agent will always explore the environment by taking a random action. The exploration rate is then decayed over time. This means that the agent will explore the environment less and less as it learns more about the environment.
+A balance between `exploration` (taking random actions) and `exploitation` (taking the best action) is maintained using an `exploration rate`. This rate represents the probability of the agent exploring the environment through a random action. Initially set to 1, the exploration rate ensures the agent always explores the environment randomly. Over time, this rate decays, leading to less exploration as the agent learns more about the optimal action-selection policy.
 
 **3. Update the Q-table using the Bellman Equation.**
-The Bellman Equation is the core of Q-Learning. It is a recursive equation that calculates the Q-value for a state-action pair. The equation is as follows:
+The Bellman Equation, central to Q-Learning, is a recursive equation that calculates the Q-value for a state-action pair. The equation is as follows:
 
-$$Q(S,A) = Q(S,A) + \alpha * [R(S,A) + \gamma * \max Q(S',a) - Q(S,A)]$$
+$$Q(S,A) = (1-\alpha) * Q(S,A) + \alpha * [R(S,A) + \gamma * \max_{a'} Q(S',a')]$$
+Here,
 
-where,
-
-- $Q(S,A)$ is the Q-value for the state-action pair. It is the quality of the action in the given state.
-- $\alpha$ is the learning rate. It determines how much the newly acquired information overrides the existing information. This is a value between 0 and 1. A value of 0 means that the Q-values are never updated, while a value of 1 means that the Q-values are instantly updated.
-- $R(S,A)$ is the reward for the state-action pair. It is the immediate reward for taking the action in the given state.
-- $\gamma$ is the discount factor. It determines how much importance we give to future rewards. This is a value between 0 and 1. A value of 0 means that we only consider the immediate reward, while a value of 1 means that we consider future rewards with equal importance to immediate rewards.
-- $S'$ is the next state. It is the state we transition to after taking the action in the given state.
+- $Q(S,A)$ is the Q-value for the state-action pair, representing the expected future reward for taking action A in state S.
+- $\alpha$ is the learning rate, dictating how much the new information will override the existing information. This value ranges between 0 and 1, where 0 means the Q-values are never updated, and 1 means the Q-values are completely replaced by the new information.
+- $R(S,A)$ is the immediate reward for taking action A in state S.
+- $\gamma$ is the discount factor. It determines how much importance we give to future rewards. This is a value between 0 and 1. A value of 0 means that we only consider the immediate reward, while a value of 1 means that we consider future rewards with equal importance as immediate rewards.
+- $S'$ is the next state, which is the state we transition to after taking the action A in state S.
+- $\max_{a'} Q(S',a')$ is the maximum Q-value over all possible actions $a'$ in the next state $S'$. This represents the best expected future reward after we have taken the current action and moved to the next state.
 
 **4. Repeat steps 2 and 3 until the Q-table converges.**
-The Q-table converges when the Q-values stop changing. This means that the Q-values have converged to the optimal Q-values. The optimal Q-values are the Q-values that give us the optimal action-selection policy. The optimal action-selection policy is the policy that gives us the maximum reward.
+The Q-table converges when the Q-values cease to change, indicating that the Q-values have converged to the optimal Q-values. These optimal Q-values provide the optimal action-selection policy, which in turn yields the maximum reward.
 
 ## Implementation
 
-We will implement Q-Learning to play the [Frozen Lake](https://gymnasium.farama.org/environments/toy_text/frozen_lake/) game. The Frozen Lake game is a grid-world game where the goal is to reach the goal state without falling into a hole. The game is played on a 4x4 grid-world. The grid-world has four types of cells:
+We'll apply Q-Learning to the [Frozen Lake](https://gymnasium.farama.org/environments/toy_text/frozen_lake/) game. This grid-world game requires the player to reach the goal without falling into a hole. The game is set on a 4x4 grid, with four cell types:
 
 - S - Start state
 - F - Frozen state
 - H - Hole state
 - G - Goal state
 
-In each state, the agent can take one of four `actions`:
+The player, or agent, can perform one of four actions in each state:
 
 - Left
+- Down
 - Right
 - Up
-- Down
 
-The agent receives a `reward` of 1 for reaching the goal state and a reward of 0 for all other states.
+The agent earns a reward of 1 for reaching the goal state and 0 for all other states.
 
-The amount of states and actions in this game is small enough to be able to use a tabular approach.
-Each field in the grid-world is a state. This means for a 4x4 grid-world, there are 16 states.
+Given the manageable number of states and actions in this game, we can use a tabular approach. Each cell in the grid-world represents a state, so a 4x4 grid-world has 16 states.
 
-We begin by importing the required libraries.
+First, we import the necessary libraries.
 
 ```python
 import gymnasium as gym
@@ -93,10 +86,9 @@ Next, we create the environment.
 
 ```python
 env = gym.make('FrozenLake-v1', desc=None, map_name="4x4", is_slippery=False)
-random.seed(0)
 ```
 
-We set the `is_slippery` parameter to `False` to make the environment deterministic. This means that the agent will always move in the direction it intends to move.
+We set the `is_slippery` parameter to `False` to make the environment deterministic. This ensures that the agent will always move in the direction it intends to move.
 
 Next, we initialize the Q-table with zeros.
 
@@ -109,9 +101,9 @@ action_space_size = env.action_space.n # 4
 q_table = np.zeros((state_space_size, action_space_size)) # 16x4
 ```
 
-Each row in the Q-table represents a state and each column represents an action. The Q-value for a state-action pair is stored in the corresponding cell.
+Each row in the Q-table represents a state, and each column an action. The Q-value for a state-action pair is stored in the corresponding cell.
 
-Next, we define the hyperparameters.
+We then define the hyperparameters.
 
 ```python
 # Hyperparameters
@@ -125,7 +117,7 @@ min_exploration_rate = 0.01 # Ensures that the agent never stops exploring entir
 exploration_decay_rate = 0.001 # Exponential decay rate for the exploration rate
 ```
 
-Next, we define the Q-Learning algorithm.
+Next, we implement the Q-Learning algorithm.
 
 ```python
 # Q-Learning algorithm
@@ -155,21 +147,23 @@ for episode in range(num_episodes):
     exploration_rate = min_exploration_rate + (max_exploration_rate - min_exploration_rate) * np.exp(-exploration_decay_rate*episode)
 ```
 
-We begin by resetting the environment and initializing the `done` variable to `False`. The `done` variable is used to determine when the episode is over. The episode is over when the agent reaches the goal state or falls into a hole.
+We start by resetting the environment and setting `done` to `False`. This variable indicates when the episode ends, either when the agent reaches the goal state or falls into a hole.
 
-Next, we loop through the steps in the episode. In each step, we determine whether to explore or exploit. If the exploration threshold is greater than the exploration rate, then we exploit. This means that we take the action with the highest Q-value for the given state. Otherwise, we explore. This means that we take a random action.
+We then loop through the steps in the episode. In each step, we decide whether to explore or exploit. If the exploration threshold exceeds the exploration rate, we exploit by taking the action with the highest Q-value for the current state. Otherwise, we explore by taking a random action.
 
-Next, we take the action and observe the reward and the next state. We then update the Q-table using the Bellman Equation.
+After taking the action, we observe the reward and the next state. We update the Q-table using the Bellman Equation.
 
-Finally, we update the exploration rate using an exponential decay function. This ensures that the agent explores less and less as it learns more about the environment.
+Finally, we update the exploration rate using an exponential decay function, ensuring the agent explores less as it learns more about the optimal action-selection policy.
 
-## Evolution of the Q-Table
+## Progression of the Q-Table
 
-Let's take a look at the evolution of the Q-table over time. Remember that each row in the Q-table represents a state and each column represents an action. The Q-value for a state-action pair is stored in the corresponding cell. In our frozen lake game, there are 16 states and 4 actions.
+Let's examine how the Q-table progresses over time. Each row in the Q-table represents a state, while each column represents an action. The Q-value for a state-action pair is stored in the corresponding cell. In our frozen lake game, there are 16 states and 4 actions, resulting in a Q-table with 16 rows and 4 columns.
 
-This means that the Q-table has 16 rows and 4 columns. The first row represents the top left cell in the grid-world. The first column represents the action `Left`. The second column represents the action `Down`. The third column represents the action `Right`. The fourth column represents the action `Up`. The states are numbered from 0 to 15, starting from the top left cell and moving left to right and top to bottom.
+The first row corresponds to the top left cell in the grid-world. The states are numbered from 0 to 15, starting from the top left cell and moving left to right and top to bottom. The columns represent the actions `Left`, `Down`, `Right`, and `Up` respectively.
 
-After 100 episodes, the Q-table looks like this:
+Keep in mind that your Q-tables might look slightly different due to the random exploration.
+
+After 100 episodes, the Q-table appears as follows:
 
 | State | Left | Down | Right | Up  |
 | ----- | ---- | ---- | ----- | --- |
@@ -179,11 +173,9 @@ After 100 episodes, the Q-table looks like this:
 | 14    | 0.0  | 0.0  | 0.1   | 0.0 |
 | 15    | 0.0  | 0.0  | 0.0   | 0.0 |
 
-There is only one non-zero value in the Q-table. This is the Q-value for the state-action pair (14, Right). This means that the agent has learned that the best action to take in state 14 is to move right. This makes sense because state 14 is the goal state.
+The only non-zero value in the Q-table is the Q-value for the state-action pair (14, Right), indicating that the agent has learned that the optimal action in state 14 is to move right. This aligns with the fact that state 15 is the goal state. Given that the reward for reaching the goal state is 1 and our learning rate is 0.1, we can infer that the agent reached the goal state only once in the first 100 episodes.
 
-As our reward for reaching the goal state is 1 and our learning rate 0.1 we can conclude that the agent only reached the goal state once in the first 100 episodes.
-
-After 1000 episodes, the Q-table looks like this:
+After 1000 episodes, the Q-table appears as follows:
 
 | State | Left | Down | Right | Up   |
 | ----- | ---- | ---- | ----- | ---- |
@@ -204,13 +196,13 @@ After 1000 episodes, the Q-table looks like this:
 | 14    | 0.97 | 0.98 | 1.00  | 0.98 |
 | 15    | 0.00 | 0.00 | 0.00  | 0.00 |
 
-Here we can make a few observations:
+A few observations can be made:
 
-- The Q-values for the states 5, 7, 11, 12, and 15 are all zero. This makes sense because these states are holes or the goal. The update with the Q-function happens after each step but holes and the goal end the episode. This means that the agent never learns anything about these states.
-- Some invalid actions have non-zero Q-values. For example, the Q-value for the state-action pair (0, Left) is 0.94. In this case the Left action would have no effect because the agent is already in the leftmost cell. Within the game, this action would be ignored. However, the agent doesn't know this as Q-learning is a `model-free` algorithm. Therefore, during exploration, the agent will just take another action in the next step. Sooner or later, the agent will take an action that has an effect and the Q-value for the state-action pair will be updated.
-- The Q-values which are closer to the goal have higher values. This makes sense as the only rewards is happining in the goal state. As further away from the goal as more discounting is happening.
+- The Q-values for the states 5, 7, 11, 12, and 15 are all zero, which is logical as these states are either holes or the goal. The Q-function updates after each step, but holes and the goal end the episode, meaning the agent never learns anything about these states.
+- Some invalid actions have non-zero Q-values. For instance, the Q-value for the state-action pair (0, Left) is 0.94. In this case, the Left action would be ineffective as the agent is already in the leftmost cell. This action would be ignored in the game, but the agent doesn't know this as Q-learning is a `model-free` algorithm. Therefore, during exploration, the agent will take another action in the next step, eventually taking an action that has an effect and updating the Q-value for the state-action pair.
+- The Q-values closer to the goal have higher values, which is logical as the only reward is in the goal state. The further away from the goal, the more discounting occurs.
 
-After 10000 episodes, the Q-table looks like this:
+After 10000 episodes, the Q-table appears as follows:
 
 | State | Left | Down | Right | Up   |
 | ----- | ---- | ---- | ----- | ---- |
@@ -231,10 +223,10 @@ After 10000 episodes, the Q-table looks like this:
 | 14    | 0.98 | 0.99 | 1.00  | 0.98 |
 | 15    | 0.00 | 0.00 | 0.00  | 0.00 |
 
-Most of the Q-values converged already after 1000 episodes. The Q-values for the states 2, 6, 10, and 13 took longer to converge.
+Most of the Q-values had already converged after 1000 episodes. However, the Q-values for the states 2, 6, 10, and 13 took longer to converge.
 
 ## Conclusion
 
-In this blog post, we explored the topic of Tabular Q-Learning. We learned about the Bellman Equation, which is the core of Q-Learning. We then implemented Q-Learning to play the Frozen Lake game. The tabular approach is only feasible for small environments. In the next blog post, we will explore Deep Q-Learning, which is a variant of Q-Learning that uses a neural network to approximate the Q-function. This allows us to use Q-Learning in large environments.
+This blog post delved into the concept of Tabular Q-Learning. We examined the Bellman Equation, the fundamental principle of Q-Learning, and applied it to the Frozen Lake game. However, the tabular method is only practical for smaller environments. In one of the next blog posts, we will explore Deep Q-Learning, which is a variant of Q-Learning that uses a neural network to approximate the Q-function. This allows us to use Q-Learning in large environments.
 
-The code for this blog post can be found [here](https://github.com/maltehedderich/blog/blob/main/notebooks/tabular_q_learning.ipynb).
+You can find the code for this blog post [here](https://github.com/maltehedderich/blog/blob/main/notebooks/tabular_q_learning.ipynb).
