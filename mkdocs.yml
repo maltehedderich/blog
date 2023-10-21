@@ -3,7 +3,10 @@ theme:
   name: material
   palette:
     scheme: slate
+  favicon: images/favicon/favicon-192.png
   features:
     - header.autohide
-nav:
-  - Home: index.md
+plugins:
+  - blog:
+      blog_dir: .
+      blog_toc: true
