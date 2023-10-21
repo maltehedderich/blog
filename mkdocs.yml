@@ -10,3 +10,4 @@ plugins:
   - blog:
       blog_dir: .
       blog_toc: true
+  - tags
