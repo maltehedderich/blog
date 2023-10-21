@@ -207,6 +207,8 @@ After 1000 episodes, the Q-table looks like this:
 Here we can make a few observations:
 
 - The Q-values for the states 5, 7, 11, 12, and 15 are all zero. This makes sense because these states are holes or the goal. The update with the Q-function happens after each step but holes and the goal end the episode. This means that the agent never learns anything about these states.
+- Some invalid actions have non-zero Q-values. For example, the Q-value for the state-action pair (0, Left) is 0.94. In this case the Left action would have no effect because the agent is already in the leftmost cell. Within the game, this action would be ignored. However, the agent doesn't know this as Q-learning is a `model-free` algorithm. Therefore, during exploration, the agent will just take another action in the next step. Sooner or later, the agent will take an action that has an effect and the Q-value for the state-action pair will be updated.
+- The Q-values which are closer to the goal have higher values. This makes sense as the only rewards is happining in the goal state. As further away from the goal as more discounting is happening.
 
 After 10000 episodes, the Q-table looks like this:
 
