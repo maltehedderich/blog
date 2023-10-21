@@ -161,6 +161,10 @@ Let's examine how the Q-table progresses over time. Each row in the Q-table repr
 
 The first row corresponds to the top left cell in the grid-world. The states are numbered from 0 to 15, starting from the top left cell and moving left to right and top to bottom. The columns represent the actions `Left`, `Down`, `Right`, and `Up` respectively.
 
+![Frozen Lake States](/images/tabular_q_learning/frozen_lake_states_256.png)
+
+_Frozen Lake States_
+
 Keep in mind that your Q-tables might look slightly different due to the random exploration.
 
 After 100 episodes, the Q-table appears as follows:
