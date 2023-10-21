@@ -1,4 +1,5 @@
 site_name: Malte Hedderich
+
 theme:
   name: material
   palette:
@@ -6,8 +7,17 @@ theme:
   favicon: images/favicon/favicon-192.png
   features:
     - header.autohide
+
 plugins:
   - blog:
       blog_dir: .
       blog_toc: true
   - tags
+
+extra_javascript:
+  - javascripts/katex.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js
+
+extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css
