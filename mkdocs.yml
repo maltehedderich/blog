@@ -1,4 +1,7 @@
 site_name: Malte Hedderich
+site_author: Malte Hedderich
+site_url: https://blog.hedderich.pro
+google_analytics: ['G-XZ7G2PVPYR', 'blog.hedderich.pro']
 
 theme:
   name: material
