@@ -22,3 +22,17 @@ extra_javascript:
 
 extra_css:
   - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css
+
+extra:
+  analytics:
+    provider: google
+    property: G-XZ7G2PVPYR
+  consent:
+    title: Cookie consent
+    description: >-
+      I use cookies on this site to enhance your user experience, measure the effectiveness of my 
+      blog, and optimize your search results. By clicking 'Accept', you consent to the use of cookies 
+      and help me to improve my blog. Thank you!
+    actions:
+      - accept
+      - reject
