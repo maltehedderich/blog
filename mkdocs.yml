@@ -31,7 +31,7 @@ extra:
     provider: google
     property: G-XZ7G2PVPYR
   consent:
-    title: Cookie consent
+    title: Cookie Consent
     description: >-
       I use cookies on this site to enhance your user experience, measure the effectiveness of my 
       blog, and optimize your search results. By clicking 'Accept', you consent to the use of cookies 
