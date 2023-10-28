@@ -31,6 +31,7 @@ For the code examples, we will use Python 3.11. The code is available in a [Jupy
 ## Q-Learning - The Algorithm
 
 **1. Initialize the Q-Table with zeros.**
+
 The **Q-Table** initialization requires knowledge of the number of **states** and **actions**. For instance, in a simple game of tic-tac-toe, the states represent the various possible configurations of the tic-tac-toe board. Given that the board is a 3x3 grid with each cell capable of being _empty_, _X_, or _O_, there are $3^9 = 19.683$ potential states.
 
 The actions, on the other hand, represent the various moves a player can make. Depending on the state, a player can place their mark in any empty cell. Therefore, the number of actions per state can vary from 1 (if only one empty cell remains) to 9 (if the board is empty).
@@ -38,11 +39,13 @@ The actions, on the other hand, represent the various moves a player can make. D
 In our tic-tac-toe example, the Q-Table would have 19.683 rows and 9 columns. Each row represents a state, and each column represents an action. The Q-Value for a state-action pair is stored in the corresponding cell.
 
 **2. Explore the environment by taking a random action.**
+
 Initially, the **best action** to take in a **given state** is unknown. Therefore, a random action is taken, and the reward and subsequent state are observed. The Q-Table is then updated using the Bellman Equation.
 
 A balance between **exploration** (taking random actions) and **exploitation** (taking the best action) is maintained using an **exploration rate**. This rate represents the probability of the agent exploring the environment through a random action. Initially set to 1, the exploration rate ensures the agent always explores the environment randomly. Over time, this rate decays, leading to less exploration as the agent learns more about the **optimal action-selection policy**.
 
 **3. Update the Q-Table using the Bellman Equation.**
+
 The Bellman Equation, central to Q-Learning, is a recursive equation that calculates the **Q-Value** for a **state-action pair**. The equation is as follows:
 
 $$
@@ -59,6 +62,7 @@ Here,
 - $\max_{a'} Q(S',a')$ is the **maximum Q-Value** over all possible actions $a'$ in the next state $S'$. This represents the best expected future reward after we have taken the current action and moved to the next state.
 
 **4. Repeat steps 2 and 3 until the Q-Table converges.**
+
 The Q-Table converges when the **Q-Values cease to change**, indicating that the Q-Values have converged to the **optimal Q-Values**. These optimal Q-Values provide the optimal action-selection policy, which in turn yields the maximum reward.
 
 ## Implementation
