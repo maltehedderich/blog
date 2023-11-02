@@ -4,7 +4,7 @@ title: Home
 
 # Welcome!
 
-Hey there! Welcome to my blog. I'm Malte Hedderich, and I'm a machine learning engineer. I'm passionate about all things machine learning and MLOps, and I love sharing my knowledge and experience with others.
+Hey there! Welcome to my blog. I'm Malte Hedderich, and I'm a machine learning engineer. I'm passionate about all things related to machine learning and MLOps, and I love sharing my knowledge and experience with others.
 
 ## What to Expect
 
