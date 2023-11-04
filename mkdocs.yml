@@ -11,6 +11,10 @@ theme:
   features:
     - header.autohide
 
+nav:
+  - Home: index.md
+  - About: about.md
+
 plugins:
   - blog:
       blog_dir: .
