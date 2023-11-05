@@ -151,7 +151,7 @@ for episode in range(num_episodes):
 
         state = new_state
 
-        if done == True:
+        if done:
             break
 
     # Update the exploration rate
