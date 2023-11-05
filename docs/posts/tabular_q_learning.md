@@ -172,7 +172,7 @@ Let's examine how the Q-Table progresses over time. Each row in the Q-Table repr
 
 The first row corresponds to the top left cell in the grid-world. The states are numbered from 0 to 15, starting from the top left cell and moving left to right and top to bottom. The columns represent the actions `Left`, `Down`, `Right`, and `Up` respectively.
 
-![Frozen Lake State Overview](/images/tabular_q_learning/frozen_lake_states_256.png)
+![Frozen Lake State Overview](../images/tabular_q_learning/frozen_lake_states_256.png)
 
 _Frozen Lake State Overview_
 
