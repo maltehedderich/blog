@@ -244,4 +244,4 @@ Most of the Q-Values had already converged after 1000 episodes. However, the Q-V
 
 This blog post delved into the concept of Tabular Q-Learning. We examined the Bellman Equation, the fundamental principle of Q-Learning, and applied it to the Frozen Lake game. However, the tabular method is only practical for smaller environments as the Q-Table size depends on the number of states. In one of the next blog posts, we will explore Deep Q-Learning, which is a variant of Q-Learning that uses a neural network to approximate the Q-Function. This allows us to use Q-Learning in large environments.
 
-You can find the code for this blog post [here](https://github.com/maltehedderich/blog/blob/main/notebooks/tabular_q_learning.ipynb).
+You can find the code for this blog post [here](https://github.com/maltehedderich/blog/blob/main/notebooks/tabular_q_learning/tabular_q_learning.ipynb).
