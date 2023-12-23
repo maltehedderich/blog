@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://blog.hedderich.pro/</loc>
+         <lastmod>2023-12-23</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://blog.hedderich.pro/about/</loc>
+         <lastmod>2023-12-23</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://blog.hedderich.pro/2023/10/28/tabular-q-learning/</loc>
+         <lastmod>2023-12-23</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://blog.hedderich.pro/archive/2023/</loc>
+         <lastmod>2023-12-23</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://blog.hedderich.pro/category/reinforcement-learning/</loc>
+         <lastmod>2023-12-23</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://blog.hedderich.pro/category/q-learning/</loc>
+         <lastmod>2023-12-23</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+</urlset>
