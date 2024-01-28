@@ -23,7 +23,7 @@ By continuously updating the Q-Function, the algorithm enables us to create a ta
 
 ## Prerequisites
 
-For the code examples, we will use Python 3.11. The code is available in a [Jupyter Notebook](https://github.com/maltehedderich/blog/blob/main/notebooks/tabular_q_learning.ipynb). The following libraries are required:
+For the code examples, we will use Python 3.11. The code is available in a [Jupyter Notebook](https://github.com/maltehedderich/blog/blob/main/notebooks/tabular_q_learning/tabular_q_learning.ipynb). The following libraries are required:
 
 - [Gym](https://gym.openai.com/) - **OpenAI Gym** is a toolkit for developing and comparing reinforcement learning algorithms.
 - [NumPy](https://numpy.org/) - **NumPy** is a library to add support for large, multi-dimensional arrays and matrices, along with a large collection of high-level mathematical functions to operate on these arrays.
