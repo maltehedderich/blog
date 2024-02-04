@@ -322,18 +322,16 @@ print(random_search.best_params_)
 
 Which outputs the following for our random_state with `n_iter=100`:
 
-TODO UPDATE THIS
-
 ```python
 {
-    'classifier__max_depth': 10,
-    'classifier__max_features': 'sqrt',
-    'classifier__min_samples_leaf': 1,
-    'classifier__min_samples_split': 2,
-    'classifier__n_estimators': 100,
+    'classifier__max_features': None,
+    'classifier__min_samples_leaf': 4,
+    'classifier__min_samples_split': 5,
     'column_transformer__numerical_preprocessing__imputer__strategy': 'mean'
 }
 ```
+
+When looking at these hyperparameters, I assume that `classifier__max_features`: `None` is the most important one. This setting allows the model to use all features for the split, as opposed to the default value "sqrt" which only allows the square root of the total number of features. While I believe that further fine tuning of these parameters could improve performance, I will not delve into this in the scope of this blog post.
 
 ## Conclusion
 
