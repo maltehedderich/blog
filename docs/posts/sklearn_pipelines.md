@@ -1,7 +1,7 @@
 ---
 title: 'scikit-learn Pipelines'
 
-date: 2023-01-28
+date: 2023-02-05
 
 categories:
   - Machine Learning
@@ -17,11 +17,11 @@ draft: true
 
 ## Introduction
 
-Practical applications of machine learning often require the use of multiple preprocessing steps before the acutal model can be trained. For example, we may need to impute missing values, scale numeric features, encode categorical features and then fit a model. scikit-learn provides a Pipeline class that allows us to encapsulate multiple steps into a single object that can be used in place of a single estimator.
+Machine learning applications often necessitate a series of preprocessing steps before training the actual model. These steps might include imputing missing values, scaling numerical features, and encoding categorical features, followed by the model training itself. The `scikit-learn` library offers a `Pipeline` class designed to encapsulate these multiple steps into a single, cohesive object, functioning similarly to a single estimator.
 
 <!-- more -->
 
-With pipelines, we can structure our code in a way that is more modular and easier to maintain. We can also use pipelines to automate the process of training and evaluating multiple models with different preprocessing steps. They are particularly useful when we expect new data to arrive over time, and we want to be able to quickly retrain our model with the new data. In this post, we will learn how to use pipelines in scikit-learn.
+Utilizing pipelines enables a more modular and maintainable code structure. Additionally, pipelines facilitate the automation of training and evaluating various models, each with distinct preprocessing configurations. This feature becomes particularly beneficial when dealing with continuous data influx, allowing for swift model retraining with updated data. In this blog post, we will explore how to effectively implement pipelines in `scikit-learn`, enhancing both the efficiency and clarity of our machine learning workflows.
 
 ## Prerequisites
 
@@ -33,7 +33,7 @@ For the code examples, we will use Python 3.11. The code is available in a [Jupy
 
 ## Dataset
 
-We will use the [Spaceship Titanic](https://www.kaggle.com/competitions/spaceship-titanic/data) dataset from Kaggle. The dataset contains information about the passengers of a Spaceship which collided a spacetime annomaly. The task is to predict whether a passenger was transported to an alternate dimension during the Spaceship Titanic's collision with the spacetime anomaly. The dataset contains the following features:
+We will use the [Spaceship Titanic](https://www.kaggle.com/competitions/spaceship-titanic/data) dataset from Kaggle. The dataset contains information about the passengers of a Spaceship which collided with a spacetime annomaly. The task is to predict whether a passenger was transported to an alternate dimension during the Spaceship Titanic's collision. The dataset contains the following features:
 
 - `PassengerId` - A unique Id for each passenger. Each Id takes the form `gggg_pp` where `gggg` indicates a group the passenger is travelling with and pp is their number within the group. People in a group are often family members, but not always.
 - `HomePlanet` - The planet the passenger departed from, typically their planet of permanent residence.
@@ -48,7 +48,7 @@ We will use the [Spaceship Titanic](https://www.kaggle.com/competitions/spaceshi
 
 ## Loading the Dataset
 
-Let's start by loading the dataset into a pandas DataFrame. We will use the `read_csv` function from pandas to load the dataset from a CSV file. Furthermore, we will extract the target variable and split the dataset into a training and a test set.
+Let's start by loading the dataset into a pandas DataFrame to get an overview of the data and be able to work with it.
 
 ```python
 import pandas as pd
@@ -64,11 +64,16 @@ X = dataset_df.drop(['Transported'], axis=1)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 ```
 
-_This code assumes that the dataset is located in the `../kaggle/datasets/spaceship-titanic` directory. If you want to run the code yourself, you need to download the dataset from Kaggle and extract it to the specified directory or change the path._
+In this code snippet:
+
+- We start by importing the necessary libraries: `pandas` for data handling and `train_test_split` from scikit-learn for splitting the data.
+- The dataset is loaded into a DataFrame named `dataset_df` using `pd.read_csv()`. This step assumes that you have the dataset stored in the `../kaggle/datasets/spaceship-titanic` directory. If you're following along, ensure you've downloaded the dataset from Kaggle and placed it in the specified directory, or adjust the path accordingly.
+- We then extract the target variable, `Transported`, into a separate variable `y`. The remaining data, which will serve as our features, is stored in `X` after removing the `Transported` column with the `.drop()` method.
+- Finally, we use `train_test_split` to divide our data into training and test sets, with 20% of the data reserved for testing. This is a common practice to evaluate the performance of machine learning models on unseen data.
 
 ## Creating a Basic Pipeline
 
-Let's start by creating a basic pipeline that imputes missing values and scales numeric features. We will use the `SimpleImputer` and `StandardScaler` classes from scikit-learn. The `SimpleImputer` class replaces missing values with the mean of the feature. The `StandardScaler` class standardizes features by removing the mean and scaling to unit variance. We will use the `Pipeline` class to combine the two preprocessing steps into a single object.
+Next, we'll construct a straightforward pipeline to handle missing values and scale numeric features. We'll utilize the `SimpleImputer` and `StandardScaler` from scikit-learn for these tasks. The `SimpleImputer` fills missing values with the feature's mean, while the `StandardScaler` standardizes features by removing the mean and scaling to unit variance. These steps will be combined into a single object using the `Pipeline` class.
 
 ```python
 from sklearn.pipeline import Pipeline
@@ -81,9 +86,9 @@ numerical_preprocessor = Pipeline([
 ])
 ```
 
-This pipeline would already work and we could transform our dataset with `numerical_preprocessor.fit_transform(X)`. However, we also have categorical features in our dataset. We need to create a separate pipeline for categorical features and combine the two pipelines into a single pipeline.
+This pipeline is ready to transform our dataset using `numerical_preprocessor.fit_transform(X)`. However, as our dataset includes categorical features, we need a separate pipeline for those and then merge both pipelines.
 
-For categorical features also use the `SimpleImputer` but we replace missing values with the most frequent value of the feature. We also use the `OneHotEncoder` to encode categorical features as one-hot numeric arrays. We set `sparse_output` to `False` to get a dense array instead of a sparse matrix and `handle_unknown` to `ignore` to ignore unknown categories during transform. This is useful if we have new categories in the test set that were not present in the training set.
+For categorical features, we also use `SimpleImputer` but with the strategy to replace missing values with the most frequent value. Additionally, we employ `OneHotEncoder` to convert categorical features into one-hot encoded numeric arrays. We configure it to produce a dense array (`sparse_output=False`) and to ignore unknown categories during transformation (`handle_unknown='ignore'), which is useful when new categories are encountered in the test set which were not present in the training set.
 
 ```python
 from sklearn.pipeline import Pipeline
@@ -96,9 +101,9 @@ categorical_preprocessor = Pipeline([
 ])
 ```
 
-Great, now that we have two pipelines, one for numerical features and one for categorical features, we can combine the two pipelines into a single pipeline with the `ColumnTransformer`. The `ColumnTransformer` class applies a transformer to a subset of the columns of the input data. We can specify which columns to transform with a list of tuples. Each tuple contains the name of the transformer and a list of columns to transform. Instead of passing a list of columns, we can also pass a scikit-learn selector object. For example, we can use the `make_column_selector` function to select all columns of a certain data type.
+With both pipelines for numerical and categorical features ready, we combine them using `ColumnTransformer`. This class applies transformers to subsets of columns. We specify the columns using tuples that contain the transformer name and a list of columns, or using a selector object that can be created with `make_column_selector` and selects the columns by data type.
 
-In our case we want to apply the `numerical_preprocessor` to all numeric columns and the `categorical_preprocessor` to all categorical columns. We can do this with the following code:
+Here, we apply `numerical_preprocessor` to all numeric columns and `categorical_preprocessor` to all categorical columns:
 
 ```python
 from sklearn.compose import ColumnTransformer, make_column_selector
@@ -109,7 +114,7 @@ column_transformer = ColumnTransformer([
 ])
 ```
 
-Now that we have a single pipeline that can transform our data, we can add a classifier to the pipeline. We will use the `RandomForestClassifier` class from scikit-learn. The `RandomForestClassifier` class implements a random forest classifier. A random forest is an ensemble learning method that fits a number of decision tree classifiers on various sub-samples of the dataset and uses majority voting to predict the class of a sample.
+Now that we have a single pipeline that can transform our data, we add a classifier to the pipeline. We will use a random forest classifier. Random forest classifiers train a series of decision trees from different subsamples and determine the class prediction using a majority voting strategy. Accordingly, they belong to the ensemble learning methods, since a variety of classifiers is utilized.
 
 ```python
 from sklearn.ensemble import RandomForestClassifier
@@ -120,36 +125,44 @@ pipeline = Pipeline([
 ])
 ```
 
-At this point our pipeline looks like this:
+At this point, our pipeline looks like this:
 
 ![Basic Pipeline Overview](../images/sklearn_pipelines/basic_pipeline.png)
 
-We now can fit the pipeline to our training data and evaluate the model on the test data.
+Now we can fit the pipeline to our training data and evaluate the model using the test set.
 
 ```python
 pipeline.fit(X_train, y_train)
 accuracy_score = pipeline.score(X_test, y_test)
 ```
 
-This makes it very easy to train and evaluate the model when we get new data. We can simply call `pipeline.fit(X_train, y_train)` to train the model and `pipeline.score(X_test, y_test)` to evaluate the model on the test data.
+As the code snippet illustrates, pipelines make it very easy to train and score the model when we receive new data. We can simply call `pipeline.fit(X_train, y_train)` to train the model and `pipeline.score(X_test, y_test)` to score the model on the test data.
 
-With the random_state set to 22, we get an accuracy of **0.767**. This is not a bad result for a first try. However, we can probably improve the model by engineering some new features and tuning the hyperparameters of the model. Let's see how we can do this with pipelines.
+This setting gives an accuracy of **76.7%** with a random state of 22, which is a respectable result for a first attempt. Nonetheless, there is room for improvement, possibly through feature engineering and fine-tuning the hyperparameters of the model. Let's explore how pipelines can facilitate these improvements.
 
 ## Feature Engineering and Custom Transformers
 
-Feature engineering is the process of transforming raw data into features that better represent the underlying problem to the predictive models, resulting in improved model accuracy on unseen data. In this case the feature descriptions reveal further information which is not immediately obvious and can be used to engineer new features.
+Feature engineering is a crucial step in the data science process, where raw data is transformed into features that more accurately represent the problem at hand, thereby enhancing the predictive model's performance on unseen data. This process often uncovers additional information that isn't immediately apparent, providing opportunities to create new features.
 
-The `PassengerId` is a unique identifier for each passenger, but it is also a group identifier. While we would not expect any hidden information in a unique identifier, the group identifier could be useful. As the description states, people in a group are often family members so there might be some correlation between the group identifier and the target variable. We can extract the group identifier from the `PassengerId` and add it as a new feature.
+The `PassengerId` is a unique identifier for each passenger, but also a group identifier according to the feature descriptions provided with the dataset. While we would not expect hidden information in a unique identifier, the group identifier could be useful. According to the description, people in a group are often family members, so there might be some correlation between the group identifier and the target variable. We can extract the group identifier from the `PassengerId` and add it as a new feature.
 
-The `Cabin` column contains information about the deck, room number, and side of the ship. Here we can extract the deck and side of the ship and add them as new features.
+Similarly, the `Cabin` column offers valuable insights into the deck, room number, and side of the ship. By isolating the deck and ship side information and transforming them into separate features, we can enrich our dataset further.
 
 Furthermore, we might want to remove the `Name` column as it is unlikely to be useful for predicting the target variable.
 
-These steps are quite specific to this dataset and therefore it's unlikely to find a transformer in scikit-learn that does exactly what we want. However, we can easily create our own transformer by subclassing the `BaseEstimator` and `TransformerMixin` classes from scikit-learn. The `TransformerMixin` class provides a `fit_transform` method that calls `fit` and `transform` on the transformer. The `BaseEstimator` class provides a `get_params` and `set_params` method that are used by scikit-learn to get and set the parameters of the transformer.
+Given the specificity of these tasks to this particular dataset, it's unlikely that an off-the-shelf transformer from libraries like scikit-learn will meet our needs. However, creating a custom transformer is straightforward by subclassing the `BaseEstimator` and `TransformerMixin` classes from scikit-learn. The `TransformerMixin` class offers a `fit_transform` method, which combines `fit` and `transform`. Meanwhile, the `BaseEstimator` class provides `get_params` and `set_params` methods, which are required by other scikit-learn tools such as `GridSearchCV` and `RandomizedSearchCV`.
 
 ### Custom Transformers
 
-Let's start by splitting the `PassengerId` into the group identifier and the passenger number. To do that we create a new class called `PassengerIdSplitter` that inherits from the `BaseEstimator` and `TransformerMixin` classes. We then implement the `fit` and `transform` methods. The `fit` method is used to fit the transformer to the data and the `transform` method is used to transform the data. In this case we don't need to fit the transformer to the data as the outcome is independent of the other rows. Therefore, we simply return `self` in the `fit` method. In the `transform` method we split the `PassengerId` into the group identifier and the passenger number and add them as new features. We then drop the original `PassengerId` column and return the transformed DataFrame.
+Let's dive into how to extract both the group identifier and the passenger number from the `PassengerId`. We'll achieve this by creating a new class named `PassengerIdSplitter`, which will inherit from both the `BaseEstimator` and `TransformerMixin` classes. This setup allows us to seamlessly integrate our custom transformer into most scikit-learn workflows.
+
+To make our class functional, we need to implement two essential methods: `fit` and `transform`.
+
+- The `fit` method is designed to prepare the transformer based on the data it receives. However, in our scenario, the process of splitting the `PassengerId` is straightforward and does not depend on learning anything from the dataset. Therefore, our `fit` method will simply return `self`, indicating that no fitting process is necessary.
+
+- The `transform` method is where the magic happens. Here, we take the `PassengerId` and split it into two separate components: the group identifier and the passenger number. These components are then added to our dataset as new features. Following this, we remove the original `PassengerId` column, as it's no longer needed, and return the modified DataFrame with our newly added features.
+
+This approach not only enriches our dataset with potentially valuable information but also maintains the integrity and usability of the data for further analysis or machine learning tasks.
 
 ```python
 import pandas as pd
@@ -175,7 +188,7 @@ class PassengerIdSplitter(BaseEstimator, TransformerMixin):
         return X.drop(['PassengerId'], axis=1)
 ```
 
-The logic for the `Cabin` column follows a similar pattern. We create a new class called `CabinSplitter` that inherits from the `BaseEstimator` and `TransformerMixin` classes. We then implement the `fit` and `transform` methods. In the `fit` method we return `self` as we don't need to fit the transformer to the data. In the `transform` method we split the `Cabin` column into the deck, room and side of the ship and add them as new features. Furthermore, we transform the room number into a numeric feature to avoid categorical features with a large number of categories (high cardinality). We then drop the original `Cabin` column and return the transformed DataFrame.
+The logic for the `Cabin` column follows a similar pattern. We create a new class called `CabinSplitter`, which inherits from the `BaseEstimator` and `TransformerMixin` classes. Then we implement the methods `fit` and `transform`. In the method `fit` we return `self`, because we do not have to adapt the transformer to the data. In the method `transform` we split the column `cabin` into the deck, the room and the side of the ship and add them as new features. We also transform the room number into a numeric feature to avoid categorical features with a large number of categories (high cardinality). The original column `Cabin` is then deleted and the transformed DataFrame is returned.
 
 ```python
 import pandas as pd
@@ -205,7 +218,7 @@ class CabinSplitter(BaseEstimator, TransformerMixin):
         return X.drop(['Cabin'], axis=1)
 ```
 
-For the `Name` column we follow the same pattern but now we allow to pass a list of columns to drop to the constructor of the transformer and only drop the specified columns within the `transform` method.
+For the `Name` column, we follow the same pattern, but now we allow a list of columns to be passed to the constructor of the transformer and only drop the specified columns within the `transform` method.
 
 ```python
 import pandas as pd
@@ -247,19 +260,19 @@ Our pipeline now looks like this:
 
 ![Pipeline with Custom Transformers](../images/sklearn_pipelines/extended_pipeline.png)
 
-If we set the same random state, fit the pipeline to our training data and evaluate the model on the test data, we get an accuracy of **0.788**. This is a quite noticeable improvement over the previous model. Let's continue by tuning the hyperparameters of the model.
+If we set the same random state, fit the pipeline to our training data and evaluate the model against the test data, we get an accuracy of **0.788**. This is quite a significant improvement over the previous model. Let's move on to tuning the hyperparameters of the model.
 
 ## Hyperparameter Tuning
 
-Hyperparameter tuning is the process of finding the optimal hyperparameters for a given model. They are usually set before the learning process begins. In contrast, the parameters of a model are learned during the training process. For example, in our RandomForestClassifier the number of trees is a hyperparameter and the weights of the individual trees are parameters.
+Hyperparameter tuning is the process of identifying the best hyperparameters for a specific model. These hyperparameters are set prior to the start of the learning process, unlike the model's parameters, which are determined during training. For instance, in a RandomForestClassifier, the number of trees is a hyperparameter, while the weights of the trees are considered parameters.
 
-Scikit-learn pipelines behave like a single estimator. Therefore, we can use the model selection methods from scikit-learn to tune the hyperparameters of our pipeline. We will use the `RandomizedSearchCV` class from scikit-learn to search for the best hyperparameters. The `RandomizedSearchCV` class implements a randomized search over parameters, where each setting is sampled from a distribution over possible parameter values. We will use the `n_estimators` and `max_depth` hyperparameters of the `RandomForestClassifier` as they are the most important hyperparameters.
+Scikit-learn pipelines behave like a single estimator. Therefore, we can use scikit-learn's model selection methods to tune the hyperparameters of our pipeline. We will use scikit-learn's `RandomizedSearchCV` class to find the best hyperparameters. The class `RandomizedSearchCV` implements a randomized search over hyperparameters, where each configuration is taken from a given search space.
 
-To define our search space, we create a dictionary with the hyperparameters as keys and a list of possible values as values. To tune parameters which are not at the root level of the pipeline, we can use the `__` syntax with the name of the step and the name of the parameter. For example, to tune the `strategy` parameter of the `SimpleImputer` in our numerical preprocessing we can use `preprocessing__numerical_preprocessing__imputer__strategy`. We can then pass the search space to the `param_distributions` parameter of the `RandomizedSearchCV` class.
+To set up our search, we define a dictionary where hyperparameters are keys, and the possible values they can take are the corresponding values. For hyperparameters nested within the pipeline, we use the `__` syntax, linking the step name and the parameter name. For instance, to adjust the `strategy` parameter of a `SimpleImputer` used in numerical preprocessing, we'd use the notation `preprocessing__numerical_preprocessing__imputer__strategy`. This dictionary is then passed as the `param_distributions` argument to `RandomizedSearchCV`.
 
-Let's tune the numerical imputer strategy as well as some important parameters of the `RandomForestClassifier`. To do that we create a search space and pass it together with the pipeline to the `RandomizedSearchCV` class. We then fit the `RandomizedSearchCV` object to the training data and evaluate the model on the test data.
+Let's apply this to fine-tune the strategy of our numerical imputer and some hyperparameters of the `RandomForestClassifier`. We create a search space, include it with our pipeline in the `RandomizedSearchCV` setup, and proceed to fit this configuration to our training data. The performance is then assessed on the test data.
 
-For the RandomizedSearchCV we set the `n_iter` parameter to 1000 to sample 1000 different parameter combinations. We also set the `cv` parameter to 10 to use 10-fold cross-validation. We set the `refit` parameter to `True` to refit the best estimator on the entire training set. We set the `verbose` parameter to 1 to get some output during the search. Finally, we set the `n_jobs` parameter to `-1` to use all available processors.
+For the `RandomizedSearchCV`, we choose `n_iter=100` to explore 100 different combinations of hyperparameters. We use `cv=5` for 5-fold cross-validation, ensuring a robust evaluation. The `refit=True` option ensures the best-found model is retrained on the full training dataset. Lastly, `n_jobs=-1` allows the use of all available processors to speed up the search.
 
 ```python
 from scipy.stats import randint
@@ -268,12 +281,10 @@ from sklearn.model_selection import RandomizedSearchCV
 # Define the search space
 search_space = [
     {
-        'column_transformer__numerical_preprocessing__imputer__strategy': ['mean', 'median', 'most_frequent'],
-        'classifier__n_estimators': randint(50, 500),
-        'classifier__max_depth': randint(3, 25),
-        'classifier__min_samples_split': randint(2, 50),
-        'classifier__min_samples_leaf': randint(1, 25),
-        'classifier__max_features': ['sqrt', 'log2'],
+        'column_transformer__numerical_preprocessing__imputer__strategy': ['mean', 'median'],
+        'classifier__min_samples_split': randint(2, 15),
+        'classifier__min_samples_leaf': randint(1, 10),
+        'classifier__max_features': ['sqrt', 'log2', None],
     }
 ]
 
@@ -283,9 +294,8 @@ random_search = RandomizedSearchCV(
     search_space,
     scoring='accuracy',
     refit=True,
-    n_iter=1000,
-    cv=10,
-    verbose=1,
+    n_iter=100,
+    cv=5,
     n_jobs=-1,
     random_state=RANDOM_STATE
 )
@@ -296,21 +306,23 @@ random_search.fit(X_train, y_train)
 
 _Note: This step can take a while to run. If you want to run the code yourself, you can reduce the number of iterations to speed up the process._
 
-The code above shows that the search_space is a list of dictionaries. This is especially useful if we want to tune multiple models with different search spaces. You can simply add another model to the list and overwrite the classifer in the pipeline and define the relevant hyperparameters to tune.
+The code snippet provided illustrates the `search_space` is defined as a list of dictionaries. This is particularly beneficial when you're aiming to tune multiple models, each requiring a unique set of hyperparameters. To add another model to your tuning process, you can simply include it in the list. Then, update the classifier in your pipeline and specify the hyperparameters you wish to adjust for that model.
 
-After the search is finished, we can evaluate the model on the test data.
+Once the search is complete, we can evaluate the model based on the test data.
 
 ```python
 accuracy_score = random_search.score(X_test, y_test)
 ```
 
-We get an accuracy of TODO: add accuracy. This is a further improvement over the previous model. We can also look at the best parameters with the `best_params_` attribute of the `RandomizedSearchCV` object.
+We obtain an accuracy score of **0.792** when using the same random state. This represents an improvement compared to the performance of our previous model. To gain further insights into how this performance was achieved, we can examine the optimal set of hyperparameters selected during the search. This information is accessible via the `best_params_` attribute of the `RandomizedSearchCV` object.
 
 ```python
 print(random_search.best_params_)
 ```
 
-Which outputs the following for our random_state with `n_iter=1000`:
+Which outputs the following for our random_state with `n_iter=100`:
+
+TODO UPDATE THIS
 
 ```python
 {
@@ -325,6 +337,6 @@ Which outputs the following for our random_state with `n_iter=1000`:
 
 ## Conclusion
 
-In this post, we learned how to use pipelines in scikit-learn. We learned how to create a basic pipeline, how to add custom transformers to the pipeline, and how to tune the hyperparameters of the pipeline. We also learned how to use the pipeline to train and evaluate the model on new data.
+In this post, we've explored the use of pipelines in scikit-learn, covering the essentials from creating a basic pipeline to incorporating custom transformers and tuning hyperparameters. We also delved into how pipelines facilitate the training and evaluation of models on new data.
 
-Pipelines are a powerful tool for structuring our code in a way that is more modular and easier to maintain. They are particularly useful when we expect new data to arrive over time, and we want to be able to quickly retrain our model with the new data.
+Pipelines serve as an invaluable tool for organizing our code more modularly and enhancing maintainability. They shine especially when dealing with continuous data inflow, enabling swift retraining of models with fresh data. This feature makes pipelines not just a convenience but a strategic advantage in dynamic environments where data constantly evolves.
