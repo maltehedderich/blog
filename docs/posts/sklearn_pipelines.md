@@ -17,25 +17,35 @@ draft: false
 
 ## Introduction
 
-Machine learning applications often need a series of preprocessing steps before training the actual model. These steps might include imputing missing values, scaling numerical features, and encoding categorical features, followed by the model training itself. The `scikit-learn` library offers a `Pipeline` class designed to encapsulate these multiple steps into a single, cohesive object, functioning similarly to a single estimator.
+Machine learning projects frequently require a sequence of preprocessing tasks to prepare the data for model training. Such tasks can range from filling in missing values and normalizing numerical data to encoding categorical data. The `scikit-learn` library simplifies this process through its `Pipeline` class. This handy tool allows to bundle the preprocessing steps and model training into one unified workflow, acting much like an individual estimator.
 
 <!-- more -->
 
-Utilizing pipelines enables a more modular and maintainable code structure. Additionally, pipelines ease the automation of training and evaluating various models, each with distinct preprocessing configurations. This feature becomes particularly beneficial when dealing with continuous data influx, allowing for swift model retraining with updated data. In this blog post, we will explore how to effectively implement pipelines in `scikit-learn`, enhancing both the efficiency and clarity of our machine learning workflows.
+## Benefits of Using Pipelines
+
+Incorporating pipelines into your `scikit-learn` projects brings a multitude of benefits that streamline the machine learning process:
+
+1. **Modularity**: Pipelines promote a modular approach to coding by bundling preprocessing and model training steps into distinct components. This not only simplifies the code, making it more accessible and easier to manage but also allows these components to be reused across different projects, enhancing efficiency and consistency.
+
+2. **Automation**: Pipelines facilitate the automation of training and evaluation for multiple models with predefined configurations for preprocessing and training. This is particularly useful when dealing with continuous data influx, as it allows for swift model retraining with updated data.
+
+3. **Reproducibility**: By using pipelines, you can ensure that the same preprocessing steps are applied consistently to different datasets. This improves the reproducibility of your machine learning experiments.
+
+In this blog post, we will explore how to effectively implement pipelines in `scikit-learn`, demonstrating how they can improve the efficiency and clarity of your machine learning workflows.
 
 ## Prerequisites
 
-For the code examples, we will use Python 3.11. The code is available in a [Jupyter Notebook](https://github.com/maltehedderich/blog/blob/main/notebooks/pipelines_sklearn/pipelines_sklearn.ipynb). The following libraries are needed:
+For the code examples, we will use Python 3.11. The code is available in this [Jupyter Notebook](https://github.com/maltehedderich/blog/blob/main/notebooks/pipelines_sklearn/pipelines_sklearn.ipynb). The following libraries are needed to run the code examples:
 
-- [scikit-learn](https://scikit-learn.org/) - **scikit-learn** is a Python library for machine learning. It offers a wide range of machine learning algorithms and preprocessing steps.
-- [pandas](https://pandas.pydata.org/) - **pandas** is a Python library for data manipulation and analysis. It provides data structures and operations for manipulating numerical tables and time series.
-- [scipy](https://www.scipy.org/) - **scipy** is a Python library for scientific computing. It offers a wide range of mathematical algorithms and convenience functions built on top of NumPy.
+- [scikit-learn](https://scikit-learn.org/) - **scikit-learn** is a machine learning library. It offers a wide range of machine learning algorithms and preprocessing steps.
+- [pandas](https://pandas.pydata.org/) - **pandas** is a library for data manipulation and analysis. It provides data structures and operations for manipulating numerical tables and time series.
+- [scipy](https://www.scipy.org/) - **scipy** is a library for scientific computing. It offers a wide range of mathematical algorithms and convenience functions built on top of NumPy.
 
 ## Dataset
 
 We will use the [Spaceship Titanic](https://www.kaggle.com/competitions/spaceship-titanic/data) dataset from Kaggle. The dataset holds information about the passengers of a Spaceship which collided with a spacetime anomaly. The task is to predict whether a passenger was transported to an alternate dimension during the Spaceship Titanic's collision. The dataset contains the following features:
 
-- `PassengerId` - A unique Id for each passenger. Each Id takes the form `gggg_pp` where `gggg` indicates a group the passenger is travelling with, and pp is their number within the group. People in a group are often family members, but not always.
+- `PassengerId` - A unique id for each passenger. Each id takes the form `gggg_pp` where `gggg` indicates a group the passenger is travelling with, and pp is their number within the group. People in a group are often family members, but not always.
 - `HomePlanet` - The planet the passenger departed from, typically their planet of permanent residence.
 - `CryoSleep` - Indicates whether the passenger elected to be put into suspended animation for the duration of the voyage. Passengers in cryosleep are confined to their cabins.
 - `Cabin` - The cabin number where the passenger is staying. Takes the form `deck/num/side`, where side can be either P for Port or S for Starboard.
@@ -44,7 +54,7 @@ We will use the [Spaceship Titanic](https://www.kaggle.com/competitions/spaceshi
 - `VIP` - Whether the passenger has paid for special VIP service during the voyage.
 - `RoomService`, `FoodCourt`, `ShoppingMall`, `Spa`, `VRDeck` - Amount the passenger has billed at each of the Spaceship Titanic's many luxury amenities.
 - `Name` - The first and last names of the passenger.
-- `Transported` - Whether the passenger was transported to another dimension. This is the target, the column you are trying to predict.
+- `Transported` - Whether the passenger was transported to another dimension. This is the target, the column we are trying to predict.
 
 ## Loading the Dataset
 
@@ -88,7 +98,7 @@ numerical_preprocessor = Pipeline([
 
 This pipeline is ready to transform our dataset using `numerical_preprocessor.fit_transform(X)`. However, as our dataset includes categorical features, we need a separate pipeline for those and then merge both pipelines.
 
-For categorical features, we also use `SimpleImputer` but with the strategy to replace missing values with the most frequent value. Additionally, we employ `OneHotEncoder` to convert categorical features into one-hot encoded numeric arrays. We configure it to produce a dense array (`sparse_output=False`) and to ignore unknown categories during transformation (`handle_unknown='ignore'), which is useful when new categories are encountered in the test set which were not present in the training set.
+For categorical features, we also use `SimpleImputer` but with the strategy to replace missing values with the most frequent value. Additionally, we employ `OneHotEncoder` to convert categorical features into one-hot encoded numeric arrays. We configure it to produce a dense array (`sparse_output=False`) and to ignore unknown categories during transformation (`handle_unknown='ignore'`), which is useful when new categories are encountered which were not present in the training set.
 
 ```python
 from sklearn.pipeline import Pipeline
@@ -101,7 +111,7 @@ categorical_preprocessor = Pipeline([
 ])
 ```
 
-With both pipelines for numerical and categorical features ready, we combine them using `ColumnTransformer`. This class applies transformers to subsets of columns. We specify the columns using tuples that hold the transformer name and a list of columns, or using a selector object that can be created with `make_column_selector` and selects the columns by data type.
+With both pipelines for numerical and categorical features ready, we combine them using `ColumnTransformer`. This class applies transformers to subsets of columns. We can specify the columns using tuples that hold the transformer name and a list of columns, or using a selector object that can be created with `make_column_selector` and selects the columns by data type.
 
 Here, we apply `numerical_preprocessor` to all numeric columns and `categorical_preprocessor` to all categorical columns:
 
@@ -142,13 +152,13 @@ This setting gives an accuracy of **76.7%** with a random state of 22, which is 
 
 ## Feature Engineering and Custom Transformers
 
-Feature engineering is a crucial step in the data science process, where raw data is transformed into features that more accurately represent the problem at hand, thereby enhancing the predictive model's performance on unseen data. This process often uncovers additional information that is not immediately apparent, providing opportunities to create new features.
+Feature engineering is a crucial step in the data science process, where raw data is transformed into features that more accurately represent the problem at hand, thereby enhancing the predictive performance of the model on unseen data.
 
 The `PassengerId` is a unique identifier for each passenger, but also a group identifier according to the feature descriptions provided with the dataset. While we would not expect hidden information in a unique identifier, the group identifier could be useful. According to the description, people in a group are often family members, so there might be some correlation between the group identifier and the target variable. We can extract the group identifier from the `PassengerId` and add it as a new feature.
 
-Similarly, the `Cabin` column offers valuable insights into the deck, room number, and side of the ship. By isolating the deck and ship side information and transforming them into separate features, we can enrich our dataset further.
+Similarly, the `Cabin` column offers valuable insights into the deck, room number, and side of the ship. By transforming these information into separate features, we can enrich our dataset further.
 
-Furthermore, we might want to remove the `Name` column as it is unlikely to be useful for predicting the target variable.
+Additionally, we might want to remove the `Name` column as it is unlikely to be useful for predicting the target variable.
 
 Given the specificity of these tasks to this dataset, it's unlikely that an off-the-shelf transformer from libraries like scikit-learn will meet our needs. However, creating a custom transformer is straightforward by subclassing the `BaseEstimator` and `TransformerMixin` classes from scikit-learn. The `TransformerMixin` class offers a `fit_transform` method, which combines `fit` and `transform`. Meanwhile, the `BaseEstimator` class provides `get_params` and `set_params` methods, which are required by other scikit-learn tools such as `GridSearchCV` and `RandomizedSearchCV`.
 
