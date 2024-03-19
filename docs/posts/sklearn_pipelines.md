@@ -1,7 +1,7 @@
 ---
 title: 'scikit-learn Pipelines'
 
-date: 2023-02-11
+date: 2024-02-11
 
 categories:
   - Machine Learning
@@ -26,9 +26,7 @@ Machine learning projects frequently require a sequence of preprocessing tasks t
 Incorporating pipelines into your `scikit-learn` projects brings a multitude of benefits that streamline the machine learning process:
 
 1. **Modularity**: Pipelines promote a modular approach to coding by bundling preprocessing and model training steps into distinct components. This not only simplifies the code, making it more accessible and easier to manage but also allows these components to be reused across different projects, enhancing efficiency and consistency.
-
 2. **Automation**: Pipelines facilitate the automation of training and evaluation for multiple models with predefined configurations for preprocessing and training. This is particularly useful when dealing with continuous data influx, as it allows for swift model retraining with updated data.
-
 3. **Reproducibility**: By using pipelines, you can ensure that the same preprocessing steps are applied consistently to different datasets. This improves the reproducibility of your machine learning experiments.
 
 In this blog post, we will explore how to effectively implement pipelines in `scikit-learn`, demonstrating how they can improve the efficiency and clarity of your machine learning workflows.
@@ -169,7 +167,6 @@ Let's dive into how to extract both the group identifier and the passenger numbe
 To make our class functional, we need to implement two essential methods: `fit` and `transform`.
 
 - The `fit` method is designed to prepare the transformer based on the data it receives. However, in our scenario, the process of splitting the `PassengerId` is straightforward and does not depend on learning anything from the dataset. Therefore, our `fit` method will simply return `self`, indicating that no fitting process is necessary.
-
 - The `transform` method is where the magic happens. Here, we take the `PassengerId` and split it into two separate components: the group identifier and the passenger number. These components are then added to our dataset as new features. Following this, we remove the original `PassengerId` column, as it's no longer needed, and return the modified DataFrame with our newly added features.
 
 This approach not only enriches our dataset with potentially valuable information but also maintains the integrity and usability of the data for further analysis or machine learning tasks.
