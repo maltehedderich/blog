@@ -28,3 +28,6 @@ Temporary Items
 
 # virtualenv
 .venv
+
+# site packages
+site
