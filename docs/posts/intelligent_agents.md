@@ -56,13 +56,15 @@ When the model can use multiple tools and reason about the results, and decide i
 
 While this simple example helps to illustrate the concept, to become really useful, such system frequently need to have a lot of different tools available. If the goal is to achive the example above, it would be better to just model this as a single function call.
 
-### Should I Use Agentic Systems?
+## Should I Implement Agentic Systems?
 
-While agentic systems can be very useful, they are not always the best solution for every problem. In software development in general I would always recommend to start with the simplest solution which solves the problem, and only add complexity if it is really necessary. This is true for systems which use large language models especially, as they add non deterministic behavior.
+While agentic systems can be very useful, they are not always the best solution for every problem. In software development in general I would always recommend to start with the simplest solution which solves the problem, and only add complexity if it is really necessary. This is especially true for systems which use large language models, as they add non deterministic behavior.
+
+You should always specifically define the problem you want to solve, and then look for the best solution to solve that problem. If the problem can be solved with a simple LLM call, then this is the best solution. If the problem can be solved with a RAG system, then this is the best solution. If the problem can be solved with a single tool usage, then this is the best solution. If the problem can be solved with a statically defined workflow, then this is the best solution. Only if the problem requires dynamic reasoning and multiple tool usage, then an agentic system might be the best solution.
 
 ![Agentic Problem Decision Tree](../images/intelligent_agents/agentic_problem.png)
 
-As described in the decision tree above, I would always recommend to start looking for programmatic solutions first, if that does not solve the problem, I would look for a simple LLM solution. If that does not solve the problem, I would look for a more complex LLM solution with tools, and might place that in a statically modelled workflow. Only if all that does not solve the problem, I might consider an agentic solution. I think it's awesome what modern agentic systems can achieve, but as more freedom the model has, as more undeterministic the behavior becomes.
+I think of AI Agents as dynamic workflows where the next action is not statically defined, but rather a set of possible actions is available and the model can decide which action to take based on the current context. This is a very powerful concept, but it is not always necessary to implement such systems. In many cases, a simple workflow with a single tool usage is sufficient to solve the problem.
 
 ## Conclusion
 
@@ -70,7 +72,3 @@ As described in the decision tree above, I would always recommend to start looki
 - Not all hype, there is real value in agentic systems but it is not always necessary to implement them.
 - Agentic systems are not always the best solution, sometimes simpler solutions are more effective.
 - Agentic systems are the solution for a specific set of problems, not a value proposition in itself.
-
-```
-
-```
