@@ -1,16 +1,12 @@
-[tool.poetry]
+[project]
 name = "blog"
 version = "0.1.0"
 description = "This repository hosts the code for my personal blog, powered by GitHub Pages. It features my thoughts, projects, and insights on various topics. Feel free to explore and engage with the content."
-authors = ["Malte Hedderich <github@hedderich.pro>"]
+authors = [{ name = "Malte Hedderich", email = "github@hedderich.pro" }]
+requires-python = "~=3.13"
 readme = "README.md"
 
-[tool.poetry.dependencies]
-python = "^3.11"
-mkdocs = "^1.5.3"
-mkdocs-material = "^9.4.6"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+dependencies = [
+    "mkdocs>=1.5.3,<2",
+    "mkdocs-material>=9.4.6,<10",
+]
