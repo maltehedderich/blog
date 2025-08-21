@@ -1,0 +1,21 @@
+flowchart TD
+    A[Problem to Solve] --> B{Can it be solved with<br/>standard programming?}
+    
+    B -->|Yes| C[Traditional Programming<br/>Solution]
+    B -->|No| D{Can it be solved with<br/>a simple LLM call?}
+    
+    D -->|Yes| E[Basic LLM<br/>Solution]
+    D -->|No| F{Can it be solved with<br/>LLM + Tools?}
+    
+    F -->|Yes| G[LLM with<br/>Tool Integration]
+    F -->|No| H{Can it be solved with<br/>a static AI workflow?}
+    
+    H -->|Yes| I[Structured AI<br/>Workflow]
+    H -->|No| J[Dynamic Agentic<br/>System]
+    
+    C --> K[Just Do It!]
+    E --> K
+    G --> K
+    I --> K
+    J --> L[Agentic system might be<br/>the right solution here]
+    

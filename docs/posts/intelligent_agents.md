@@ -1,0 +1,76 @@
+---
+title: 'Do You Know What Agents Are?'
+date: 2025-08-21
+categories:
+  - LLM
+tags:
+  - Beginner
+draft: true
+---
+
+# Do You Know What Agents Are?
+
+Everyone related to the tech industry certainly heard a lot of hype around agentic AI, agent communication protocols and multi agent systems. It’s a topic you see every day in the news, social media, and everyone is talking about it, but do you even know what AI agents are? Would you define a simple large language model as AI agent? How about a large language model with some tools? Does the language model need to perform actions in the form of write operations to be an agent?
+
+In the following I will share my view of what makes artificial intelligence agentic and when I would implement such systems. While my definition originates from the academic definition of an intelligent agent, it's rather my personal interpretation based on my experience with generative AI and agentic systems. All the following is related to agentic systems in the context of large language models (LLMs) and not necessarily applicable to other AI systems.
+
+## Academic Definition
+
+An intelligent agent was defined as system which “percepts from the environment and perform actions” in the book [Artificial Intelligence: A Modern Approach by Stuart Russell and Peter Norvig](https://www.magradze.de/academics/CS550/Russel_AI.pdf) which was initially published in 1995. The book explains the concept on the example of a vacuum cleaner which is widly teached in computer science courses. I learned about this definition within university before large language models were a thing, but I think it still is a good starting point to understand what an agent is.
+
+The classic vacuum cleaner world consists of:
+
+- **Environment**: A simple grid illustrating the world with dirt and empty spaces.
+- **Perception**: The vacuum cleaner can sense its current position and whether there is dirt in that position.
+- **Actions**: The vacuum cleaner can move to adjacent positions and clean the dirt in its current position.
+
+The solution here was implmented as a simple rule-based system, which is not most people these days would refer to as agentic AI. The vacuum cleaner is not intelligent, it just follows a set of rules to perform its actions based on the perception of the environment.
+
+I would translate this to the world of large language models with the following components:
+
+- **Environment**: The complete conversational context (message history, system prompts), which might contain any information which can be represented as text. This can be a simple user message, the response to a SQL query, or even a textual representation of a graph.
+- **Perceive**: Interpretation of the converstational context, which could be extracting relevant information from the message history, understanding the intent of the user, or recognizing patterns in the data. I would also consider capability assement in the form of tool availability and tool capabilities as part of the perception.
+- **Act**: Selection of the next action based on the available tools and the current context. The response is technically always just text, but frequently it is a structured response which is then interpreted by the system to perform an action. I would not consider a simple text response as an action, but if a tool is executed based on the response, I would consider this an action. This could be a SQL query, a file write operation, or any other action which is not just a text response.
+
+## Specific Examples
+
+### Simple LLM Call
+
+When the user asks a question and the model responds with a textual message. This I would clearly not consider an agentic system, as there is only a very limited perception of the environment (the user message) and no actions are performed beyond generating a text response. The model does not have any tools available, nor does it perform any actions.
+
+### Retrieval-Augmented Generation (RAG)
+
+When the users question is answered by the large language model with additional context information from a knowledge base this would be considered a retrieval-augmented generation (RAG) system. I still would not consider this an agentic system, as we only increased the perception of the environment by adding additional context information, but the model still only generates a text response without performing any actions.
+
+### Single Tool Usage
+
+When we define functions and describe them to the model, we can give it the ability to perform actions based on the user input. For example, if the user asks for the current weather and the model can call a weather API with information from the user message to finally return the weather information. This I would see as the simplest form of an agentic system, as the model can now perceive the environment (user message and tool capabilities) and perform actions (call the weather API). The model is still not intelligent, but it can now perform actions based on the user input.
+
+### Retrieval-Augmented Generation with Tool Usage
+
+When the model does not just retrieves knowledge from a single source, but has the option to use multiple tools to retrieve information, we reach something which is called agentic RAG. In this case, the model has the ability to look up information in one or more data sources, and then respond to the user with taking the retrieved information into account. This is a concept which is frequently very useful in practice, as it allows the model to retrieve information from multiple sources and combine them to provide a more comprehensive answer. I personally would not require the action to be a write operation, so I would also consider this a simple agentic system.
+
+### Multi-Tool Usage with Reasoning
+
+When the model can use multiple tools and reason about the results, and decide if it needs to call another tool based on the results of the first tool, I would consider this a more advanced agentic system. For example, if the user asks for the current weather in a specific city and the model can first look up the city in a database, then call a weather API with the city information, and finally return the weather information to the user. This is frequently realised with an internal agent scratchpad, where the model can store intermediate results and use them to reason about the next action.
+
+While this simple example helps to illustrate the concept, to become really useful, such system frequently need to have a lot of different tools available. If the goal is to achive the example above, it would be better to just model this as a single function call.
+
+### Should I Use Agentic Systems?
+
+While agentic systems can be very useful, they are not always the best solution for every problem. In software development in general I would always recommend to start with the simplest solution which solves the problem, and only add complexity if it is really necessary. This is true for systems which use large language models especially, as they add non deterministic behavior.
+
+![Agentic Problem Decision Tree](../images/intelligent_agents/agentic_problem.png)
+
+As described in the decision tree above, I would always recommend to start looking for programmatic solutions first, if that does not solve the problem, I would look for a simple LLM solution. If that does not solve the problem, I would look for a more complex LLM solution with tools, and might place that in a statically modelled workflow. Only if all that does not solve the problem, I might consider an agentic solution. I think it's awesome what modern agentic systems can achieve, but as more freedom the model has, as more undeterministic the behavior becomes.
+
+## Conclusion
+
+- No value in throwing buzzwords around, real value is created when problems are specified and solved via specific solutions.
+- Not all hype, there is real value in agentic systems but it is not always necessary to implement them.
+- Agentic systems are not always the best solution, sometimes simpler solutions are more effective.
+- Agentic systems are the solution for a specific set of problems, not a value proposition in itself.
+
+```
+
+```
