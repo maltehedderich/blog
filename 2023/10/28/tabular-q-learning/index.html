@@ -1,0 +1,1323 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Malte Hedderich">
+      
+      
+        <link rel="canonical" href="https://blog.hedderich.pro/2023/10/28/tabular-q-learning/">
+      
+      
+      
+        <link rel="next" href="../../../../2024/02/11/scikit-learn-pipelines/">
+      
+      
+      <link rel="icon" href="../../../../images/favicon/favicon-192.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.17">
+    
+    
+      
+        <title>Tabular Q-Learning - Malte Hedderich</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.7e37652d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-XZ7G2PVPYR"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-XZ7G2PVPYR",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-XZ7G2PVPYR",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>if("undefined"!=typeof __md_analytics){var consent=__md_get("__consent");consent&&consent.analytics&&__md_analytics()}</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#introduction" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Malte Hedderich" class="md-header__button md-logo" aria-label="Malte Hedderich" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Malte Hedderich
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Tabular Q-Learning
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Malte Hedderich" class="md-nav__button md-logo" aria-label="Malte Hedderich" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Malte Hedderich
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    About
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Archive
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2025/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2025
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2024/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2024
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2023/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2023
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Categories
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agents
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LLM
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/mlops/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MLOps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/machine-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Machine Learning
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/pipelines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Pipelines
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/q-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Q-Learning
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Reinforcement Learning
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/scikit-learn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    scikit-learn
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Introduction
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#q-learning-the-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      Q-Learning - The Algorithm
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#progression-of-the-q-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      Progression of the Q-Table
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conclusion
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../.." class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2023-10-28 00:00:00+00:00" class="md-ellipsis">October 28, 2023</time>
+                      </div>
+                    </li>
+                    
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"/></svg>
+                          <span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/reinforcement-learning/">Reinforcement Learning</a>, 
+                              <a href="../../../../category/q-learning/">Q-Learning</a></span>
+                        </div>
+                      </li>
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              9 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+        <span class="md-tag">Advanced</span>
+      
+    
+  </nav>
+
+
+
+  <h1>Tabular Q-Learning</h1>
+
+<h2 id="introduction">Introduction</h2>
+<p>This blog post delves into the topic of <strong>Tabular Q-Learning</strong>, a specific type of Q-Learning. Q-Learning is used in various applications like game playing, robot navigation, in economics and trade, and many more. It's particularly useful when the problem model is not known i.e., when the outcomes for actions are not predictable.</p>
+<!-- more -->
+
+<p>Q-Learning is a <em>reinforcement learning</em> algorithm, designed to identify the best action-selection policy using a <strong>Q-Function</strong>. Reinforcement learning is a subset of machine learning where an agent learns to make decisions by taking actions in an environment to maximize some type of reward. Q-Learning is a <em>model-free</em> algorithm, which implies it doesn't need a model of the environment to learn.</p>
+<p>The <strong>Q-Function</strong> measures the <em>quality</em> of an action in a specific state. This quality is calculated by adding the immediate reward to the discounted future reward. The discounted future reward is the highest possible discounted future reward achievable from the next state onwards.</p>
+<p>By continuously updating the Q-Function, the algorithm enables us to create a table of <strong>Q-Values</strong> for each state-action pair. This table can then guide us to the optimal action-selection policy.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>For the code examples, we will use Python 3.11. The code is available in a <a href="https://github.com/maltehedderich/blog/blob/main/notebooks/tabular_q_learning/tabular_q_learning.ipynb">Jupyter Notebook</a>. The following libraries are required:</p>
+<ul>
+<li><a href="https://gym.openai.com/">Gym</a> - <strong>OpenAI Gym</strong> is a toolkit for developing and comparing reinforcement learning algorithms.</li>
+<li><a href="https://numpy.org/">NumPy</a> - <strong>NumPy</strong> is a library to add support for large, multi-dimensional arrays and matrices, along with a large collection of high-level mathematical functions to operate on these arrays.</li>
+</ul>
+<h2 id="q-learning-the-algorithm">Q-Learning - The Algorithm</h2>
+<p><strong>1. Initialize the Q-Table with zeros.</strong></p>
+<p>The <strong>Q-Table</strong> initialization requires knowledge of the number of <strong>states</strong> and <strong>actions</strong>. For instance, in a simple game of tic-tac-toe, the states represent the various possible configurations of the tic-tac-toe board. Given that the board is a 3x3 grid with each cell capable of being <em>empty</em>, <em>X</em>, or <em>O</em>, there are $3^9 = 19.683$ potential states.</p>
+<p>The actions, on the other hand, represent the various moves a player can make. Depending on the state, a player can place their mark in any empty cell. Therefore, the number of actions per state can vary from 1 (if only one empty cell remains) to 9 (if the board is empty).</p>
+<p>In our tic-tac-toe example, the Q-Table would have 19.683 rows and 9 columns. Each row represents a state, and each column represents an action. The Q-Value for a state-action pair is stored in the corresponding cell.</p>
+<p><strong>2. Explore the environment by taking a random action.</strong></p>
+<p>Initially, the <strong>best action</strong> to take in a <strong>given state</strong> is unknown. Therefore, a random action is taken, and the reward and subsequent state are observed. The Q-Table is then updated using the Bellman Equation.</p>
+<p>A balance between <strong>exploration</strong> (taking random actions) and <strong>exploitation</strong> (taking the best action) is maintained using an <strong>exploration rate</strong>. This rate represents the probability of the agent exploring the environment through a random action. Initially set to 1, the exploration rate ensures the agent always explores the environment randomly. Over time, this rate decays, leading to less exploration as the agent learns more about the <strong>optimal action-selection policy</strong>.</p>
+<p><strong>3. Update the Q-Table using the Bellman Equation.</strong></p>
+<p>The Bellman Equation, central to Q-Learning, is a recursive equation that calculates the <strong>Q-Value</strong> for a <strong>state-action pair</strong>. The equation is as follows:</p>
+<p>$$
+Q(S,A) = (1-\alpha) * Q(S,A) + \alpha * [R(S,A) + \gamma * \max_{a'} Q(S',a')]
+$$</p>
+<p>Here,</p>
+<ul>
+<li>$Q(S,A)$ is the <strong>Q-Value</strong> for the state-action pair, representing the expected future reward for taking action A in state S.</li>
+<li>$\alpha$ is the <strong>learning rate</strong>, dictating how much the new information will override the existing information. This value ranges between 0 and 1, where 0 means the Q-Values are never updated, and 1 means the Q-Values are completely replaced by the new information.</li>
+<li>$R(S,A)$ is the immediate reward for taking action A in state S.</li>
+<li>$\gamma$ is the <strong>discount factor</strong>. It determines how much importance we give to future rewards. This is a value between 0 and 1. A value of 0 means that we only consider the immediate reward, while a value of 1 means that we consider future rewards with equal importance as immediate rewards.</li>
+<li>$S'$ is the <strong>next state</strong>, which is the state we transition to after taking the action A in state S.</li>
+<li>$\max_{a'} Q(S',a')$ is the <strong>maximum Q-Value</strong> over all possible actions $a'$ in the next state $S'$. This represents the best expected future reward after we have taken the current action and moved to the next state.</li>
+</ul>
+<p><strong>4. Repeat steps 2 and 3 until the Q-Table converges.</strong></p>
+<p>The Q-Table converges when the <strong>Q-Values cease to change</strong>, indicating that the Q-Values have converged to the <strong>optimal Q-Values</strong>. These optimal Q-Values provide the optimal action-selection policy, which in turn yields the maximum reward.</p>
+<h2 id="implementation">Implementation</h2>
+<p>We'll apply Q-Learning to the <a href="https://gymnasium.farama.org/environments/toy_text/frozen_lake/">Frozen Lake</a> game. This grid-world game requires the player to reach the goal without falling into a hole. The game is set on a 4x4 grid, with four cell types:</p>
+<ul>
+<li>S - Start state</li>
+<li>F - Frozen state</li>
+<li>H - Hole state</li>
+<li>G - Goal state</li>
+</ul>
+<p>The player, or agent, can perform one of four actions in each state:</p>
+<ul>
+<li>Left</li>
+<li>Down</li>
+<li>Right</li>
+<li>Up</li>
+</ul>
+<p>The agent earns a reward of 1 for reaching the goal state and 0 for all other states.</p>
+<p>Given the manageable number of states and actions in this game, we can use a tabular approach. Each cell in the grid-world represents a state, so a 4x4 grid-world has 16 states.</p>
+<p>First, we import the necessary libraries.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+</span></code></pre></div>
+<p>Next, we create the environment.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;FrozenLake-v1&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">map_name</span><span class="o">=</span><span class="s2">&quot;4x4&quot;</span><span class="p">,</span> <span class="n">is_slippery</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span></code></pre></div>
+<p>We set the <code>is_slippery</code> parameter to <code>False</code> to make the environment deterministic. This ensures that the agent will always move in the direction it intends to move.</p>
+<p>Next, we initialize the Q-Table with zeros.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Define the state and action space sizes</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">state_space_size</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">n</span> <span class="c1"># 16</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">action_space_size</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">n</span> <span class="c1"># 4</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1"># Initialize the Q-Table with zeros</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">q_table</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">state_space_size</span><span class="p">,</span> <span class="n">action_space_size</span><span class="p">))</span> <span class="c1"># 16x4</span>
+</span></code></pre></div>
+<p>Each row in the Q-Table represents a state, and each column an action. The Q-Value for a state-action pair is stored in the corresponding cell.</p>
+<p>We then define the necessary hyperparameters.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Hyperparameters</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">num_episodes</span> <span class="o">=</span> <span class="mi">10000</span> <span class="c1"># Total number of episodes to train the agent</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">max_steps_per_episode</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># Max steps per episode</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.1</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">discount_rate</span> <span class="o">=</span> <span class="mf">0.99</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">exploration_rate</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># Initial exploration rate</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">max_exploration_rate</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">min_exploration_rate</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="c1"># Ensures that the agent never stops exploring entirely</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="n">exploration_decay_rate</span> <span class="o">=</span> <span class="mf">0.001</span> <span class="c1"># Exponential decay rate for the exploration rate</span>
+</span></code></pre></div>
+<p>Next, we implement the Q-Learning algorithm.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Q-Learning algorithm</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">for</span> <span class="n">episode</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_episodes</span><span class="p">):</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">state</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_steps_per_episode</span><span class="p">):</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>        <span class="c1"># Exploration-exploitation trade-off</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>        <span class="n">exploration_threshold</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>        <span class="c1"># If exploration_threshold &gt; exploration_rate, then exploitation</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>        <span class="k">if</span> <span class="n">exploration_threshold</span> <span class="o">&gt;</span> <span class="n">exploration_rate</span><span class="p">:</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>            <span class="n">action</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">q_table</span><span class="p">[</span><span class="n">state</span><span class="p">,:])</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>            <span class="n">action</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>        <span class="n">new_state</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>        <span class="c1"># Update Q-Table</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>        <span class="n">q_table</span><span class="p">[</span><span class="n">state</span><span class="p">,</span> <span class="n">action</span><span class="p">]</span> <span class="o">=</span> <span class="n">q_table</span><span class="p">[</span><span class="n">state</span><span class="p">,</span> <span class="n">action</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">learning_rate</span><span class="p">)</span> <span class="o">+</span> <span class="n">learning_rate</span> <span class="o">*</span> <span class="p">(</span><span class="n">reward</span> <span class="o">+</span> <span class="n">discount_rate</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">q_table</span><span class="p">[</span><span class="n">new_state</span><span class="p">,</span> <span class="p">:]))</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>        <span class="n">state</span> <span class="o">=</span> <span class="n">new_state</span>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>        <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>            <span class="k">break</span>
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>    <span class="c1"># Update the exploration rate</span>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>    <span class="n">exploration_rate</span> <span class="o">=</span> <span class="n">min_exploration_rate</span> <span class="o">+</span> <span class="p">(</span><span class="n">max_exploration_rate</span> <span class="o">-</span> <span class="n">min_exploration_rate</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">exploration_decay_rate</span><span class="o">*</span><span class="n">episode</span><span class="p">)</span>
+</span></code></pre></div>
+<p>We start by resetting the environment and setting <code>done</code> to <code>False</code>. This variable indicates when the episode ends, either when the agent reaches the goal state or falls into a hole.</p>
+<p>We then loop through the steps in the episode. In each step, we decide whether to explore or exploit. If the exploration threshold exceeds the exploration rate, we exploit by taking the action with the highest Q-Value for the current state. Otherwise, we explore by taking a random action.</p>
+<p>After taking the action, we observe the reward and the next state. We update the Q-Table using the Bellman Equation.</p>
+<p>Finally, we update the exploration rate using an exponential decay function, ensuring the agent explores less as it learns more about the optimal action-selection policy.</p>
+<h2 id="progression-of-the-q-table">Progression of the Q-Table</h2>
+<p>Let's examine how the Q-Table progresses over time. Each row in the Q-Table represents a state, while each column represents an action. The Q-Value for a state-action pair is stored in the corresponding cell. In our frozen lake game, there are 16 states and 4 actions, resulting in a Q-Table with 16 rows and 4 columns.</p>
+<p>The first row corresponds to the top left cell in the grid-world. The states are numbered from 0 to 15, starting from the top left cell and moving left to right and top to bottom. The columns represent the actions <code>Left</code>, <code>Down</code>, <code>Right</code>, and <code>Up</code> respectively.</p>
+<p><img alt="Frozen Lake State Overview" src="../../../../images/tabular_q_learning/frozen_lake_states_256.png" /></p>
+<p><em>Frozen Lake State Overview</em></p>
+<p>Keep in mind that your Q-Tables might look slightly different for your run due to the random exploration.</p>
+<p>After 100 episodes, the Q-Table appears as follows:</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Left</th>
+<th>Down</th>
+<th>Right</th>
+<th>Up</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr>
+<td>13</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr>
+<td>14</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.1</td>
+<td>0.0</td>
+</tr>
+<tr>
+<td>15</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table>
+<p>The only non-zero value in the Q-Table is the Q-Value for the state-action pair (14, Right), indicating that the agent has learned that the optimal action in state 14 is to move right. This aligns with the fact that state 15 is the goal state. Given that the reward for reaching the goal state is 1 and our learning rate is 0.1, we can infer that the agent reached the goal state only once in the first 100 episodes.</p>
+<p>After 1000 episodes, the Q-Table appears as follows:</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Left</th>
+<th>Down</th>
+<th>Right</th>
+<th>Up</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0.94</td>
+<td>0.95</td>
+<td>0.93</td>
+<td>0.94</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0.94</td>
+<td>0.00</td>
+<td>0.63</td>
+<td>0.76</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0.31</td>
+<td>0.89</td>
+<td>0.02</td>
+<td>0.41</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0.12</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.02</td>
+</tr>
+<tr>
+<td>4</td>
+<td>0.95</td>
+<td>0.96</td>
+<td>0.00</td>
+<td>0.94</td>
+</tr>
+<tr>
+<td>5</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>6</td>
+<td>0.00</td>
+<td>0.98</td>
+<td>0.00</td>
+<td>0.48</td>
+</tr>
+<tr>
+<td>7</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>8</td>
+<td>0.96</td>
+<td>0.00</td>
+<td>0.97</td>
+<td>0.95</td>
+</tr>
+<tr>
+<td>9</td>
+<td>0.96</td>
+<td>0.98</td>
+<td>0.98</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>10</td>
+<td>0.97</td>
+<td>0.99</td>
+<td>0.00</td>
+<td>0.96</td>
+</tr>
+<tr>
+<td>11</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>12</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>13</td>
+<td>0.00</td>
+<td>0.83</td>
+<td>0.99</td>
+<td>0.83</td>
+</tr>
+<tr>
+<td>14</td>
+<td>0.97</td>
+<td>0.98</td>
+<td>1.00</td>
+<td>0.98</td>
+</tr>
+<tr>
+<td>15</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+</tbody>
+</table>
+<p>A few observations can be made:</p>
+<ul>
+<li>The Q-Values for the states 5, 7, 11, 12, and 15 are all zero, which is logical as these states are either holes or the goal. The Q-Function updates after each step, but holes and the goal end the episode, meaning the agent never learns anything about these states.</li>
+<li>Some invalid actions have non-zero Q-Values. For instance, the Q-Value for the state-action pair (0, Left) is 0.94. In this case, the Left action would be ineffective as the agent is already in the leftmost cell. This action would be ignored in the game, but the agent doesn't know this as Q-Learning is a <em>model-free</em> algorithm. Therefore, during exploration, the agent will take another action in the next step, eventually taking an action that has an effect and updating the Q-Value for the state-action pair.</li>
+<li>The Q-Values closer to the goal have higher values, which is logical as the only reward is in the goal state. The further away from the goal, the more discounting occurs.</li>
+</ul>
+<p>After 10000 episodes, the Q-Table appears as follows:</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Left</th>
+<th>Down</th>
+<th>Right</th>
+<th>Up</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0.94</td>
+<td>0.95</td>
+<td>0.93</td>
+<td>0.94</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0.94</td>
+<td>0.00</td>
+<td>0.80</td>
+<td>0.88</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0.91</td>
+<td>0.20</td>
+<td>0.01</td>
+<td>0.18</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0.11</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>4</td>
+<td>0.95</td>
+<td>0.96</td>
+<td>0.00</td>
+<td>0.94</td>
+</tr>
+<tr>
+<td>5</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>6</td>
+<td>0.00</td>
+<td>0.86</td>
+<td>0.00</td>
+<td>0.26</td>
+</tr>
+<tr>
+<td>7</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>8</td>
+<td>0.96</td>
+<td>0.00</td>
+<td>0.97</td>
+<td>0.95</td>
+</tr>
+<tr>
+<td>9</td>
+<td>0.96</td>
+<td>0.98</td>
+<td>0.98</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>10</td>
+<td>0.94</td>
+<td>0.99</td>
+<td>0.00</td>
+<td>0.67</td>
+</tr>
+<tr>
+<td>11</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>12</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>13</td>
+<td>0.00</td>
+<td>0.98</td>
+<td>0.99</td>
+<td>0.97</td>
+</tr>
+<tr>
+<td>14</td>
+<td>0.98</td>
+<td>0.99</td>
+<td>1.00</td>
+<td>0.98</td>
+</tr>
+<tr>
+<td>15</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+</tbody>
+</table>
+<p>Most of the Q-Values had already converged after 1000 episodes. However, the Q-Values for the states 2, 6, 10, and 13 took longer to converge.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>This blog post delved into the concept of Tabular Q-Learning. We examined the Bellman Equation, the fundamental principle of Q-Learning, and applied it to the Frozen Lake game. However, the tabular method is only practical for smaller environments as the Q-Table size depends on the number of states. In one of the next blog posts, we will explore Deep Q-Learning, which is a variant of Q-Learning that uses a neural network to approximate the Q-Function. This allows us to use Q-Learning in large environments.</p>
+<p>You can find the code for this blog post <a href="https://github.com/maltehedderich/blog/blob/main/notebooks/tabular_q_learning/tabular_q_learning.ipynb">here</a>.</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+
+  
+
+
+
+      
+    </article>
+  </div>
+
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+      <div class="md-consent" data-md-component="consent" id="__consent" hidden>
+        <div class="md-consent__overlay"></div>
+        <aside class="md-consent__inner">
+          <form class="md-consent__form md-grid md-typeset" name="consent">
+            
+
+
+
+  
+
+<h4>Cookie Consent</h4>
+<p>I use cookies on this site to enhance your user experience, measure the effectiveness of my  blog, and optimize your search results. By clicking 'Accept', you consent to the use of cookies  and help me to improve my blog. Thank you!</p>
+<input class="md-toggle" type="checkbox" id="__settings" checked>
+<div class="md-consent__settings">
+  <ul class="task-list">
+    
+    
+      
+        
+  
+  
+    
+    
+  
+  <li class="task-list-item">
+    <label class="task-list-control">
+      <input type="checkbox" name="analytics" checked>
+      <span class="task-list-indicator"></span>
+      Google Analytics
+    </label>
+  </li>
+
+      
+    
+    
+      
+    
+    
+  </ul>
+</div>
+<div class="md-consent__controls">
+  
+    
+      <button class="md-button md-button--primary">Accept</button>
+    
+    
+    
+  
+    
+    
+      <button type="reset" class="md-button md-button--primary">Reject</button>
+    
+    
+  
+</div>
+          </form>
+        </aside>
+      </div>
+      <script>var consent=__md_get("__consent");if(consent)for(var input of document.forms.consent.elements)input.name&&(input.checked=consent[input.name]||!1);else"file:"!==location.protocol&&setTimeout((function(){document.querySelector("[data-md-component=consent]").hidden=!1}),250);var form=document.forms.consent;for(var action of["submit","reset"])form.addEventListener(action,(function(e){if(e.preventDefault(),"reset"===e.type)for(var n of document.forms.consent.elements)n.name&&(n.checked=!1);__md_set("__consent",Object.fromEntries(Array.from(new FormData(form).keys()).map((function(e){return[e,!0]})))),location.hash="",location.reload()}))</script>
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../../..", "features": ["header.autohide", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.92b07e13.min.js"></script>
+      
+        <script src="../../../../javascripts/katex.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+      
+    
+  </body>
+</html>
