@@ -3,7 +3,7 @@ name = "blog"
 version = "0.1.0"
 description = "This repository hosts the code for my personal blog, powered by GitHub Pages. It features my thoughts, projects, and insights on various topics. Feel free to explore and engage with the content."
 authors = [{ name = "Malte Hedderich", email = "github@hedderich.pro" }]
-requires-python = "~=3.13"
+requires-python = ">=3.13,<4"
 readme = "README.md"
 
 dependencies = [
