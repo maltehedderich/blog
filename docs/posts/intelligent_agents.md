@@ -13,6 +13,8 @@ draft: false
 
 Everyone related to the tech industry certainly heard a lot of hype around agentic AI, agent communication protocols and multi agent systems. It’s a topic you see every day in the news, social media, and everyone is talking about it, but do you even know what AI agents are? Would you define a simple large language model call as AI agent? How about a large language model with some tools? Does the language model need to perform actions in the form of write operations to be an agent?
 
+<!-- more -->
+
 In the following I will share my view of what makes artificial intelligence agentic and when I would implement such systems. While my definition originates from the academic definition of an intelligent agent, it's my personal interpretation based on my experience with generative AI and agentic systems. All the following is related to agentic systems in the context of large language models (LLMs) and not necessarily applicable to other AI systems.
 
 ## Academic Definition
