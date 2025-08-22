@@ -2,6 +2,7 @@
 title: 'Do You Know What Agents Are?'
 date: 2025-08-22
 categories:
+  - Agents
   - LLM
 tags:
   - Beginner
