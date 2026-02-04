@@ -10,3 +10,8 @@ dependencies = [
     "mkdocs>=1.5.3,<2",
     "mkdocs-material>=9.4.6,<10",
 ]
+
+[tool.uv.workspace]
+members = [
+    "notebooks/spam_filter_dspy",
+]

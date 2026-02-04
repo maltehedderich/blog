@@ -1,0 +1,19 @@
+[project]
+name = "spam-filter-dspy"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "arize-phoenix-client>=1.28.0",
+    "dspy>=3.1.2",
+    "ipykernel>=7.1.0",
+    "ipywidgets>=8.1.8",
+    "openinference-instrumentation-dspy>=0.1.33",
+    "opentelemetry-exporter-otlp>=1.39.1",
+    "opentelemetry-sdk>=1.39.1",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = 'py313'
