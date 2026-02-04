@@ -31,3 +31,6 @@ Temporary Items
 
 # site packages
 site
+
+# Private Folder
+private/**
