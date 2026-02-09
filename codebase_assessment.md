@@ -17,13 +17,13 @@ The codebase represents a low-risk static documentation site with good modern pr
 
 ### Key Findings Summary
 
-| Category | Critical | High | Medium | Low | Total |
-|----------|----------|------|--------|-----|-------|
-| **Security** | 0 | 0 | 3 | 2 | 5 |
-| **Code Quality** | 0 | 0 | 2 | 3 | 5 |
-| **Dependencies** | 0 | 0 | 1 | 1 | 2 |
-| **Configuration** | 0 | 0 | 1 | 2 | 3 |
-| **Total** | **0** | **0** | **7** | **8** | **15** |
+| Category          | Critical | High  | Medium | Low   | Total  |
+| ----------------- | -------- | ----- | ------ | ----- | ------ |
+| **Security**      | 0        | 0     | 3      | 2     | 5      |
+| **Code Quality**  | 0        | 0     | 2      | 3     | 5      |
+| **Dependencies**  | 0        | 0     | 1      | 1     | 2      |
+| **Configuration** | 0        | 0     | 1      | 2     | 3      |
+| **Total**         | **0**    | **0** | **7**  | **8** | **15** |
 
 ### Critical Action Items
 
@@ -55,6 +55,7 @@ None identified. This is a well-maintained static site with no critical vulnerab
   - Build-time compilation eliminates runtime vulnerabilities
 
 - **Content Organization**: Well-structured directory layout
+
   ```
   docs/          # Content layer
   ├── posts/     # Blog articles
@@ -89,6 +90,7 @@ None identified. This is a well-maintained static site with no critical vulnerab
 **Issues Identified:**
 
 **[MEDIUM]** Serialized Model File in Repository
+
 - **Location:** `/home/user/blog/notebooks/pipelines_sklearn/model.pkl` (45 MB)
 - **Issue:** Large binary pickle file committed to repository
 - **Risk:**
@@ -101,6 +103,7 @@ None identified. This is a well-maintained static site with no critical vulnerab
   - Consider using model versioning system (DVC, MLflow) for production use
 
 **[LOW]** Large Dataset Files in Repository
+
 - **Location:** `/home/user/blog/notebooks/kaggle/datasets/spaceship-titanic/`
 - **Issue:** CSV dataset files in version control
 - **Impact:** Increases repository clone time
@@ -124,11 +127,13 @@ None identified. This is a well-maintained static site with no critical vulnerab
 **Observations:**
 
 - CI/CD workflow (`.github/workflows/main.yaml:33-34`) uses `--force` flag
+
   ```yaml
   - name: Deploy to GitHub Pages
     run: |
       uv run mkdocs gh-deploy --force
   ```
+
   - ⚠️ The `--force` flag overwrites history without validation
   - Could mask deployment errors
 
@@ -195,6 +200,7 @@ None identified. This is a well-maintained static site with no critical vulnerab
 **Issues Identified:**
 
 **[MEDIUM]** Outdated Documentation
+
 - **Location:** `README.md:20`
 - **Issue:** Documentation references Poetry, but project uses `uv`
   ```markdown
@@ -203,20 +209,24 @@ None identified. This is a well-maintained static site with no critical vulnerab
 - **Actual Tool:** `uv` (as per `pyproject.toml` and CI/CD workflow)
 - **Impact:** Confuses contributors
 - **Recommendation:** Update README to reflect current tooling:
+
   ```markdown
   ### Prerequisites
+
   - [Python 3.13+](https://www.python.org/downloads/)
   - [uv](https://github.com/astral-sh/uv)
 
   ### Installing
+
   uv sync
   ```
 
 **[LOW]** Hardcoded Google Analytics ID
+
 - **Location:** `mkdocs.yml:4` and `mkdocs.yml:37`
 - **Issue:** Analytics ID appears twice (redundant)
   ```yaml
-  google_analytics: ['G-XZ7G2PVPYR', 'blog.hedderich.pro']
+  google_analytics: ["G-XZ7G2PVPYR", "blog.hedderich.pro"]
   # ...
   extra:
     analytics:
@@ -243,8 +253,8 @@ None identified. This is a well-maintained static site with no critical vulnerab
   ```yaml
   theme:
     features:
-      - header.autohide      # Clear feature names
-      - content.code.copy    # Self-explanatory
+      - header.autohide # Clear feature names
+      - content.code.copy # Self-explanatory
   ```
 
 **Strengths:**
@@ -281,6 +291,7 @@ None identified. This is a well-maintained static site with no critical vulnerab
 **Issues:**
 
 **[LOW]** Incomplete Documentation
+
 - **Missing:** CONTRIBUTING.md
 - **Missing:** CODE_OF_CONDUCT.md
 - **Missing:** Architecture documentation
@@ -313,6 +324,7 @@ Static documentation sites typically don't require automated testing. Quality as
 Consider adding:
 
 1. **Link Validation**: Check for broken links
+
    ```bash
    # Install linkchecker
    uv add linkchecker
@@ -321,6 +333,7 @@ Consider adding:
    ```
 
 2. **Markdown Linting**: Ensure consistent formatting
+
    ```bash
    # Use markdownlint
    npm install -g markdownlint-cli
@@ -343,6 +356,7 @@ Consider adding:
 **Findings:**
 
 - **Direct Dependencies (2):**
+
   ```toml
   # pyproject.toml:9-12
   dependencies = [
@@ -352,6 +366,7 @@ Consider adding:
   ```
 
 - **Transitive Dependencies (30 packages):**
+
   ```
   mkdocs v1.6.1
   ├── click v8.2.1
@@ -369,6 +384,7 @@ Consider adding:
   ```
 
 **Notebook Dependencies:**
+
 ```
 # notebooks/tabular_q_learning/requirements.txt
 gymnasium==0.29.1
@@ -381,17 +397,20 @@ cloudpickle==3.0.0
 ✅ **No Critical or High Vulnerabilities Found**
 
 **Checked Dependencies:**
+
 - MkDocs 1.6.1: No known CVEs
 - MkDocs-Material 9.6.17: No known CVEs (latest security patches applied)
 - KaTeX 0.16.7: No recent XSS vulnerabilities reported
 
 **Historical Context:**
+
 - MkDocs had CVE-2021-40978 (Path Traversal) - Fixed in versions > 1.2.3 ✅
 - MkDocs-Material had Underscore.js CVE-2021-23358 - Fixed in recent versions ✅
 
 **Issues:**
 
 **[MEDIUM]** External CDN Dependencies
+
 - **Location:** `mkdocs.yml:28-29` and `mkdocs.yml:32`
 - **Issue:** Loading KaTeX from CDN without Subresource Integrity (SRI)
   ```yaml
@@ -406,10 +425,15 @@ cloudpickle==3.0.0
   ```yaml
   extra_javascript:
     - javascripts/katex.js
-    - { src: 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js', integrity: 'sha384-...', crossorigin: 'anonymous' }
+    - {
+        src: "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js",
+        integrity: "sha384-...",
+        crossorigin: "anonymous",
+      }
   ```
 
 **[LOW]** Potentially Outdated Notebook Dependencies
+
 - **Location:** `notebooks/tabular_q_learning/requirements.txt`
 - **Issue:** Fixed versions from 2023
   - `numpy==1.26.2` (released Nov 2023)
@@ -470,7 +494,7 @@ Schedule quarterly dependency updates to maintain currency.
 - **CI/CD Permissions**: `.github/workflows/main.yaml:8-9`
   ```yaml
   permissions:
-    contents: write  # Required for gh-deploy
+    contents: write # Required for gh-deploy
   ```
 
 **Assessment:**
@@ -497,8 +521,8 @@ Schedule quarterly dependency updates to maintain currency.
 document$.subscribe(({ body }) => {
   renderMathInElement(body, {
     delimiters: [
-      { left: '$$', right: '$$', display: true },
-      { left: '$', right: '$', display: false },
+      { left: "$$", right: "$$", display: true },
+      { left: "$", right: "$", display: false },
       // ...
     ],
   });
@@ -582,9 +606,11 @@ extra:
 **Findings:**
 
 - **No Secrets in Repository**: Comprehensive scan completed
+
   ```bash
   grep -ri "password\|secret\|api_key\|token" docs/ notebooks/
   ```
+
   - ✅ No hardcoded credentials found
 
 - **Public Identifiers Only**:
@@ -594,6 +620,7 @@ extra:
 **False Positive Investigation:**
 
 Blog post `docs/posts/agents_running_state.md:143` contains:
+
 ```python
 api_key=settings.azure_openai_api_key.get_secret_value(),
 ```
@@ -606,6 +633,7 @@ api_key=settings.azure_openai_api_key.get_secret_value(),
 > You can find the full definition of this object in the `settings.py` file..."
 
 The example shows how to **correctly** handle secrets using:
+
 - Environment variables
 - Pydantic's `SecretStr` type
 - `.get_secret_value()` method for safe access
@@ -635,6 +663,7 @@ The example shows how to **correctly** handle secrets using:
 
 - **No System Calls**: No shell command execution in application
 - **CI/CD Commands**: Fixed commands in GitHub Actions
+
   ```yaml
   # .github/workflows/main.yaml:30
   run: uv sync
@@ -642,6 +671,7 @@ The example shows how to **correctly** handle secrets using:
   # .github/workflows/main.yaml:33-34
   run: uv run mkdocs gh-deploy --force
   ```
+
   - ✅ No user input in CI/CD commands
   - ✅ No variable interpolation from untrusted sources
 
@@ -705,10 +735,14 @@ curl -I https://blog.hedderich.pro
 **Workaround Options:**
 
 1. **Meta Tag CSP** (Partial Solution):
+
    ```html
-   <meta http-equiv="Content-Security-Policy"
-         content="default-src 'self'; script-src 'self' cdnjs.cloudflare.com;">
+   <meta
+     http-equiv="Content-Security-Policy"
+     content="default-src 'self'; script-src 'self' cdnjs.cloudflare.com;"
+   />
    ```
+
    - ⚠️ Limitations: Cannot use `frame-ancestors`, less secure than HTTP header
 
 2. **CloudFlare Proxy** (Recommended):
@@ -756,7 +790,7 @@ run: uv run mkdocs gh-deploy --force
   run: test -d site && test -f site/index.html
 
 - name: Deploy to GitHub Pages
-  run: uv run mkdocs gh-deploy  # Remove --force
+  run: uv run mkdocs gh-deploy # Remove --force
 ```
 
 ---
@@ -823,12 +857,13 @@ onnx_model = convert_sklearn(random_search, initial_types=[...])
 - **CI/CD Permissions**: Minimal required permissions
   ```yaml
   permissions:
-    contents: write  # Only permission granted
+    contents: write # Only permission granted
   ```
 
 **GitHub Actions Security:**
 
 ✅ Good practices:
+
 - Uses pinned action versions (`@v4`, `@v5`, `@v6`)
 - No secrets required (public deployment)
 - Limited permission scope
@@ -851,13 +886,13 @@ GitHub Pages does not allow custom security headers. This is a platform constrai
 
 **Current State:**
 
-| Header | Status | Impact |
-|--------|--------|--------|
-| Content-Security-Policy | ❌ Missing | Medium risk for XSS |
-| X-Frame-Options | ❌ Missing | Low risk (public blog) |
-| X-Content-Type-Options | ❌ Missing | Low risk |
-| Strict-Transport-Security | ✅ Provided by GitHub | Good |
-| Referrer-Policy | ❌ Missing | Low risk |
+| Header                    | Status                | Impact                 |
+| ------------------------- | --------------------- | ---------------------- |
+| Content-Security-Policy   | ❌ Missing            | Medium risk for XSS    |
+| X-Frame-Options           | ❌ Missing            | Low risk (public blog) |
+| X-Content-Type-Options    | ❌ Missing            | Low risk               |
+| Strict-Transport-Security | ✅ Provided by GitHub | Good                   |
+| Referrer-Policy           | ❌ Missing            | Low risk               |
 
 **CORS Configuration:**
 
@@ -904,14 +939,14 @@ consent:
 
 **Comprehensive Scan:**
 
-| Package | Version | Known CVEs | Status |
-|---------|---------|------------|--------|
-| mkdocs | 1.6.1 | None current | ✅ Safe |
-| mkdocs-material | 9.6.17 | None current | ✅ Safe |
-| jinja2 | 3.1.6 | None current | ✅ Safe |
-| pyyaml | 6.0.2 | None current | ✅ Safe |
-| requests | 2.32.5 | None current | ✅ Safe |
-| pygments | 2.19.2 | None current | ✅ Safe |
+| Package         | Version | Known CVEs   | Status  |
+| --------------- | ------- | ------------ | ------- |
+| mkdocs          | 1.6.1   | None current | ✅ Safe |
+| mkdocs-material | 9.6.17  | None current | ✅ Safe |
+| jinja2          | 3.1.6   | None current | ✅ Safe |
+| pyyaml          | 6.0.2   | None current | ✅ Safe |
+| requests        | 2.32.5  | None current | ✅ Safe |
+| pygments        | 2.19.2  | None current | ✅ Safe |
 
 **Historical Issues (Resolved):**
 
@@ -974,6 +1009,7 @@ jobs:
 **File:** `mkdocs.yml:26-32`
 
 **Current:**
+
 ```yaml
 extra_javascript:
   - javascripts/katex.js
@@ -987,6 +1023,7 @@ extra_css:
 **Recommended:**
 
 Generate SRI hashes:
+
 ```bash
 curl -s https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js | \
   openssl dgst -sha384 -binary | openssl base64 -A
@@ -1003,6 +1040,7 @@ unzip katex.zip -d docs/vendor/katex/0.16.7
 ```
 
 Update `mkdocs.yml`:
+
 ```yaml
 extra_javascript:
   - javascripts/katex.js
@@ -1014,6 +1052,7 @@ extra_css:
 ```
 
 **Benefits:**
+
 - Eliminates CDN compromise risk
 - Faster load times (same origin)
 - No external dependencies
@@ -1025,7 +1064,8 @@ extra_css:
 **File:** `README.md:20-28`
 
 **Current:**
-```markdown
+
+````markdown
 ### Prerequisites
 
 - [Python](https://www.python.org/downloads/)
@@ -1036,7 +1076,9 @@ extra_css:
 ```bash
 poetry install
 ```
-```
+````
+
+````
 
 **Recommended:**
 ```markdown
@@ -1050,11 +1092,12 @@ poetry install
 Install dependencies:
 ```bash
 uv sync
-```
+````
 
 ### Local Development
 
 Serve the site locally:
+
 ```bash
 uv run mkdocs serve
 ```
@@ -1064,12 +1107,14 @@ Visit http://localhost:8000 to preview changes.
 ### Building
 
 Build the static site:
+
 ```bash
 uv run mkdocs build
 ```
 
 Output will be in the `site/` directory.
-```
+
+````
 
 **Also update:** `README.md:35`
 ```markdown
@@ -1080,8 +1125,9 @@ The project is deployed automatically via GitHub Actions on push to `main`.
 To deploy manually:
 ```bash
 uv run mkdocs gh-deploy
-```
-```
+````
+
+````
 
 ---
 
@@ -1097,9 +1143,10 @@ uv run mkdocs gh-deploy
    echo "*.pkl" >> .gitignore
    echo "*.joblib" >> .gitignore
    echo "**/kaggle/datasets/" >> .gitignore
-   ```
+````
 
 2. **Remove from Git history:**
+
    ```bash
    git rm --cached notebooks/pipelines_sklearn/model.pkl
    git commit -m "chore: remove binary model from version control"
@@ -1108,12 +1155,14 @@ uv run mkdocs gh-deploy
 3. **Add regeneration instructions to notebook:**
 
    Add markdown cell at end of notebook:
+
    ```markdown
    ## Model Persistence
 
    **Note:** The trained model file (`model.pkl`) is not included in version control.
 
    To regenerate the model:
+
    1. Run all cells in this notebook
    2. The model will be saved to `model.pkl` in this directory
    3. For production use, consider using MLflow or DVC for model versioning
@@ -1141,28 +1190,32 @@ uv run mkdocs gh-deploy
 
 ```javascript
 // cloudflare-worker.js
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
-})
+addEventListener("fetch", (event) => {
+  event.respondWith(handleRequest(event.request));
+});
 
 async function handleRequest(request) {
-  const response = await fetch(request)
-  const newResponse = new Response(response.body, response)
+  const response = await fetch(request);
+  const newResponse = new Response(response.body, response);
 
   // Add security headers
-  newResponse.headers.set('Content-Security-Policy',
+  newResponse.headers.set(
+    "Content-Security-Policy",
     "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' cdnjs.cloudflare.com; " +
-    "style-src 'self' 'unsafe-inline' cdnjs.cloudflare.com; " +
-    "img-src 'self' data: https:; " +
-    "font-src 'self' data:;"
-  )
-  newResponse.headers.set('X-Frame-Options', 'SAMEORIGIN')
-  newResponse.headers.set('X-Content-Type-Options', 'nosniff')
-  newResponse.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-  newResponse.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
+      "script-src 'self' 'unsafe-inline' cdnjs.cloudflare.com; " +
+      "style-src 'self' 'unsafe-inline' cdnjs.cloudflare.com; " +
+      "img-src 'self' data: https:; " +
+      "font-src 'self' data:;",
+  );
+  newResponse.headers.set("X-Frame-Options", "SAMEORIGIN");
+  newResponse.headers.set("X-Content-Type-Options", "nosniff");
+  newResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  newResponse.headers.set(
+    "Permissions-Policy",
+    "geolocation=(), microphone=(), camera=()",
+  );
 
-  return newResponse
+  return newResponse;
 }
 ```
 
@@ -1186,6 +1239,7 @@ Migrate to Netlify with `_headers` file:
 **File:** `.github/workflows/main.yaml`
 
 **Current:**
+
 ```yaml
 - name: Deploy to GitHub Pages
   run: |
@@ -1193,6 +1247,7 @@ Migrate to Netlify with `_headers` file:
 ```
 
 **Recommended:**
+
 ```yaml
 - name: Build Site
   run: uv run mkdocs build --strict
@@ -1222,9 +1277,9 @@ Migrate to Netlify with `_headers` file:
 # Branch name pattern: main
 
 Required:
-- Require status checks to pass before merging
-  - build-and-deploy
-- Require branches to be up to date before merging
+  - Require status checks to pass before merging
+    - build-and-deploy
+  - Require branches to be up to date before merging
 ```
 
 ---
@@ -1236,6 +1291,7 @@ Required:
 **File:** `notebooks/tabular_q_learning/requirements.txt`
 
 **Current:**
+
 ```
 cloudpickle==3.0.0
 Farama-Notifications==0.0.4
@@ -1245,6 +1301,7 @@ typing_extensions==4.8.0
 ```
 
 **Recommended:**
+
 ```
 # Allow patch updates for security fixes
 cloudpickle>=3.0.0,<4.0.0
@@ -1264,20 +1321,22 @@ typing_extensions>=4.8.0,<5.0.0
 **File:** `mkdocs.yml`
 
 **Current:**
+
 ```yaml
-google_analytics: ['G-XZ7G2PVPYR', 'blog.hedderich.pro']  # Line 4 (deprecated)
+google_analytics: ["G-XZ7G2PVPYR", "blog.hedderich.pro"] # Line 4 (deprecated)
 
 # ...
 
 extra:
   analytics:
     provider: google
-    property: G-XZ7G2PVPYR  # Line 37 (current format)
+    property: G-XZ7G2PVPYR # Line 37 (current format)
 ```
 
 **Recommended:**
 
 Remove line 4 (deprecated format):
+
 ```yaml
 site_name: Malte Hedderich
 site_author: Malte Hedderich
@@ -1305,9 +1364,9 @@ Keep only the modern format in `extra` section.
 This blog is a static site with no backend. Security updates apply to:
 
 | Component | Version | Supported |
-|-----------|---------|-----------|
-| MkDocs    | 1.6.x   | ✅ Yes     |
-| Material  | 9.6.x   | ✅ Yes     |
+| --------- | ------- | --------- |
+| MkDocs    | 1.6.x   | ✅ Yes    |
+| Material  | 9.6.x   | ✅ Yes    |
 
 ## Reporting a Vulnerability
 
@@ -1344,7 +1403,7 @@ Last updated: 2025-11-17
 
 **Create:** `CONTRIBUTING.md`
 
-```markdown
+````markdown
 # Contributing to Malte Hedderich's Blog
 
 Thank you for your interest! This blog accepts contributions for:
@@ -1374,6 +1433,7 @@ uv run mkdocs serve
 # Build site
 uv run mkdocs build
 ```
+````
 
 ## Style Guidelines
 
@@ -1385,7 +1445,8 @@ uv run mkdocs build
 ## Questions?
 
 Open an issue or reach out on [LinkedIn](https://www.linkedin.com/in/hedderich).
-```
+
+````
 
 ---
 
@@ -1407,7 +1468,7 @@ Open an issue or reach out on [LinkedIn](https://www.linkedin.com/in/hedderich).
 
    # Optimize all PNGs
    find docs/images -name "*.png" -exec optipng -o7 {} \;
-   ```
+````
 
 2. **Reduce favicon variations:**
 
@@ -1422,8 +1483,8 @@ Open an issue or reach out on [LinkedIn](https://www.linkedin.com/in/hedderich).
    ```html
    <!-- Use WebP with PNG fallback -->
    <picture>
-     <source srcset="image.webp" type="image/webp">
-     <img src="image.png" alt="...">
+     <source srcset="image.webp" type="image/webp" />
+     <img src="image.png" alt="..." />
    </picture>
    ```
 
@@ -1444,7 +1505,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 0 * * 1'  # Weekly on Monday
+    - cron: "0 0 * * 1" # Weekly on Monday
 
 jobs:
   dependency-scan:
@@ -1455,7 +1516,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: "3.13"
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
@@ -1483,7 +1544,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: "3.13"
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
@@ -1522,6 +1583,7 @@ jobs:
 ```
 
 **Add to `package.json`:**
+
 ```json
 {
   "devDependencies": {
@@ -1548,7 +1610,7 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
-        args: ['--maxkb=1000']
+        args: ["--maxkb=1000"]
       - id: check-merge-conflict
 
   - repo: https://github.com/psf/black
@@ -1562,10 +1624,11 @@ repos:
     rev: v0.39.0
     hooks:
       - id: markdownlint
-        args: ['--config', '.markdownlint.json']
+        args: ["--config", ".markdownlint.json"]
 ```
 
 **Setup:**
+
 ```bash
 # Install pre-commit
 uv add pre-commit
@@ -1615,6 +1678,7 @@ updates:
 **Current:** (33 lines, macOS + Python basics)
 
 **Add:**
+
 ```gitignore
 # Python
 __pycache__/
@@ -1669,6 +1733,7 @@ build/
 **Enhance Privacy:**
 
 Consider privacy-focused alternatives:
+
 - **Plausible Analytics** (GDPR-compliant, no cookies)
 - **Fathom Analytics** (privacy-first)
 - **GoatCounter** (open source, lightweight)
@@ -1709,7 +1774,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: "3.13"
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
@@ -1729,6 +1794,7 @@ jobs:
 **Check Alt Text:**
 
 Ensure all images have descriptive alt text:
+
 ```markdown
 ![Decision tree for agentic systems](../images/intelligent_agents/agentic_problem.png)
 ```
@@ -1754,7 +1820,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: "3.13"
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
@@ -1767,7 +1833,7 @@ jobs:
       - name: Run Lighthouse
         uses: treosh/lighthouse-ci-action@v10
         with:
-          configPath: './.lighthouserc.json'
+          configPath: "./.lighthouserc.json"
           uploadArtifacts: true
 ```
 
@@ -1781,10 +1847,10 @@ jobs:
     },
     "assert": {
       "assertions": {
-        "categories:performance": ["error", {"minScore": 0.9}],
-        "categories:accessibility": ["error", {"minScore": 0.9}],
-        "categories:best-practices": ["error", {"minScore": 0.9}],
-        "categories:seo": ["error", {"minScore": 0.9}]
+        "categories:performance": ["error", { "minScore": 0.9 }],
+        "categories:accessibility": ["error", { "minScore": 0.9 }],
+        "categories:best-practices": ["error", { "minScore": 0.9 }],
+        "categories:seo": ["error", { "minScore": 0.9 }]
       }
     }
   }
@@ -1839,6 +1905,7 @@ None identified. ✅
 This is a **well-maintained, low-risk static blog** with good security practices appropriate for its purpose. The codebase demonstrates:
 
 ✅ **Strengths:**
+
 - Modern Python tooling (3.13, uv)
 - Clean architecture (static site generation)
 - No secrets in repository
@@ -1848,6 +1915,7 @@ This is a **well-maintained, low-risk static blog** with good security practices
 - Active maintenance
 
 ⚠️ **Areas for Improvement:**
+
 - Platform limitations (GitHub Pages lacks security headers)
 - Binary files in version control (model.pkl)
 - Documentation inconsistencies (Poetry → uv migration)
@@ -1863,19 +1931,14 @@ This is a **well-maintained, low-risk static blog** with good security practices
 ### Recommended Next Steps
 
 **Immediate (Week 1):**
+
 1. Update README.md documentation
 2. Add `*.pkl` to `.gitignore` and remove model.pkl
 3. Vendor KaTeX locally or add SRI hashes
 
-**Short-term (Month 1):**
-4. Implement security scanning workflow
-5. Add SECURITY.md and CONTRIBUTING.md
-6. Remove `--force` from CI/CD deployment
+**Short-term (Month 1):** 4. Implement security scanning workflow 5. Add SECURITY.md and CONTRIBUTING.md 6. Remove `--force` from CI/CD deployment
 
-**Long-term (Quarter 1):**
-7. Evaluate CloudFlare proxy for security headers
-8. Set up Dependabot for automated updates
-9. Implement link validation and accessibility checks
+**Long-term (Quarter 1):** 7. Evaluate CloudFlare proxy for security headers 8. Set up Dependabot for automated updates 9. Implement link validation and accessibility checks
 
 ---
 
@@ -1920,6 +1983,7 @@ wc -l docs/posts/*.md
 ### D. Scope Limitations
 
 This assessment covered:
+
 - ✅ Source code in repository
 - ✅ Configuration files
 - ✅ Dependencies and versions
@@ -1927,6 +1991,7 @@ This assessment covered:
 - ✅ Documentation
 
 This assessment did NOT cover:
+
 - ❌ GitHub Pages infrastructure (managed by GitHub)
 - ❌ DNS configuration for blog.hedderich.pro
 - ❌ Google Analytics account settings
@@ -1941,4 +2006,4 @@ This assessment did NOT cover:
 
 ---
 
-*This assessment should be reviewed quarterly or when significant changes are made to the codebase or dependencies.*
+_This assessment should be reviewed quarterly or when significant changes are made to the codebase or dependencies._
