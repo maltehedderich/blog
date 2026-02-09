@@ -202,8 +202,8 @@ MIPROv2 jointly optimizes _instructions_ and _few-shot examples_ for every **pre
 3.  **Bayesian Optimization**: Over a series of trials, MIPROv2 searches for the best _combination_ of instructions and demonstrations (few-shot examples) across all predictors. Each trial evaluates a candidate prompt set against `spam_metric` on a minibatch of the training data, and the best-averaging configuration is periodically validated on the full set.
 
 ```python
-teacher_lm = dspy.LM("openrouter/x-ai/grok-4.1-fast", api_base=llm_base_url, api_key=openrouter_api_key)
-student_lm = dspy.LM("openrouter/anthropic/claude-opus-4.6", api_base=llm_base_url, api_key=openrouter_api_key)  # Stronger model for optimization
+teacher_lm = dspy.LM("openrouter/anthropic/claude-opus-4.6", api_base=llm_base_url, api_key=openrouter_api_key)
+student_lm = dspy.LM("openrouter/x-ai/grok-4.1-fast", api_base=llm_base_url, api_key=openrouter_api_key)
 
 optimizer = dspy.MIPROv2(
     metric=spam_metric,
