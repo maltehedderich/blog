@@ -19,19 +19,17 @@ Most prompt engineering today is manual and intuition-driven. We tweak wording, 
 
 This is exactly what [DSPy](https://github.com/stanfordnlp/dspy) enables. Instead of manually writing prompts, you define the _signature_ of your task and a _metric_ for success, and let an optimizer find the best instructions and few-shot examples for you.
 
-In this post, we’ll build a spam filter that doesn't just look at message text but analyzes technical headers like SPF and DKIM, all optimized using the state-of-the-art `MIPROv2` optimizer.
+In this post, we’ll build a spam filter that analyzes raw headers (SPF, DKIM) alongside message text, using the `MIPROv2` optimizer to tune the performance.
 
-## The Tech Stack
+## Tech Stack
 
-To build a production-grade pipeline, we need more than just a single model call:
-
-- **DSPy**: The framework for programmatically optimizing prompts based on defined signatures and metrics.
-- **Phoenix (by Arize)**: For observability, tracing, and managing the datasets used for training and evaluation.
-- **OpenRouter**: To quickly try out different models. In this setup, we use `grok-4.1-fast` for the task execution and `claude-opus-4.6` as the "Teacher" to optimize the prompts.
+- **[DSPy](https://github.com/stanfordnlp/dspy)**: The framework for programmatically optimizing prompts based on defined signatures and metrics.
+- **[Phoenix](https://github.com/Arize-ai/phoenix)** (by Arize): For observability, tracing, and managing the datasets used for training and evaluation.
+- **[OpenRouter](https://openrouter.ai/)**: To quickly try out different models. In this setup, we use `grok-4.1-fast` for the task execution and `claude-opus-4.6` as the "Teacher" to optimize the prompts.
 
 ## Defining the Signature
 
-In DSPy, we start by defining _what_ the model should do, decoupled from _how_ it should be prompted. This is called a `Signature`.
+In DSPy, we start by defining _what_ the model should do, decoupled from _how_ it should be prompted. This is called a `Signature`. Each signature specifies the input fields, output fields, and their types.
 
 ```python
 import dspy
@@ -88,7 +86,6 @@ LEVEL_MAP = {
     "definitely_spam": 5,
 }
 
-
 def spam_metric(example: dspy.Example, prediction: dspy.Example, trace = None) -> float:
     """Calculate a weighted score based on classification correctness and prediction confidence.
 
@@ -114,8 +111,7 @@ def spam_metric(example: dspy.Example, prediction: dspy.Example, trace = None) -
     else:
         decision_score = 0.3  # False Negative (Tolerable)
 
-    # Reward predictions that land close to the ground-truth level, not just on
-    # the correct side of the binary threshold.
+    # Reward predictions that land close to the ground-truth level
     pred_level = LEVEL_MAP.get(prediction.classification, 3)
     true_level = LEVEL_MAP.get(example.classification, 0)
     calibration_bonus = 1.0 - abs(pred_level - true_level) / 5.0
@@ -125,11 +121,9 @@ def spam_metric(example: dspy.Example, prediction: dspy.Example, trace = None) -
 
 The trace parameter is useful when you want to validate intermediate steps during optimization to ensure your multi-hop reasoning program doesn't generate redundant or overly long queries.
 
-## The Dataset
+## Dataset
 
 I built 200 examples (balanced spam/non-spam) from my own inbox, which is why I won't share it publicly. You can create your own by annotating emails or using public corpora like the [Enron dataset](https://www.cs.cmu.edu/~enron/).
-
-Phoenix manages the dataset with versioning and traceability.
 
 Here's what one training example looks like:
 
@@ -161,9 +155,9 @@ Here's what one training example looks like:
 }
 ```
 
-Notice the label is binary, but our signature predicts six levels. This is a common reality: granular labels are expensive to curate. The metric bridges the gap by mapping six-level predictions to binary decisions for scoring, while still rewarding calibration. MIPROv2 uses that signal to discover richer classification strategies than the labels alone could teach.
+Notice the label is binary, but our signature predicts six levels. Ideally, your dataset should match the target, but in reality, we rarely work with perfect conditions. The metric bridges the gap by mapping six-level predictions to binary decisions for scoring, while still rewarding calibration. MIPROv2 uses that signal to discover richer classification strategies than the labels alone could teach.
 
-The dataset can be accessed via the Phoenix client:
+Phoenix makes it easy to manage datasets and track experiments. The dataset can be accessed via the Phoenix client:
 
 ```python
 from phoenix.client import Client
@@ -201,7 +195,7 @@ for example in dataset.examples:
 
 With our data, module, and metric in place, we hand it to the **MIPROv2** (**M**ultiprompt **I**nstruction **PR**oposal **O**ptimizer Version 2).
 
-MIPROv2 jointly optimizes _instructions_ and _few-shot examples_ for every predictor in your program. Under the hood it runs three stages:
+MIPROv2 jointly optimizes _instructions_ and _few-shot examples_ for every **predictor** (a module that calls an LLM) in your program. Under the hood it runs three stages:
 
 1.  **Bootstrap few-shot candidates**: The teacher model (`claude-opus-4.6`) runs the task on training examples, collecting input-output traces that serve as candidate demonstrations.
 2.  **Propose instructions**: Using the bootstrapped traces and the training data, the teacher generates multiple instruction candidates grounded in the actual failure modes and dynamics of the task.
@@ -222,7 +216,7 @@ optimizer = dspy.MIPROv2(
 optimized_app = optimizer.compile(SpamClassifier(), trainset=trainset)
 ```
 
-The `auto` parameter controls how many instruction candidates, few-shot examples, and Bayesian trials MIPROv2 explores. `"medium"` is a practical sweet spot: thorough enough to find meaningful gains, without burning through your API budget on exhaustive search.
+The `auto` parameter controls how many instruction candidates, few-shot examples, and Bayesian trials MIPROv2 explores. `"medium"` is a practical sweet spot: thorough enough to find meaningful gains, without burning through your API budget on exhaustive search. For context, a single optimization run involved **~1,000 API calls** and processed **~6 million tokens**, costing approximately **$5 USD** via OpenRouter.
 
 What comes back isn't just a "better prompt"; it's a fully parameterized configuration (instructions + demonstrations) for the student model that has been empirically optimized against your metric and your data.
 
@@ -295,29 +289,31 @@ What comes back isn't just a "better prompt"; it's a fully parameterized configu
 }
 ```
 
-The interesting parts are the `instructions` and the `demos`. The optimizer selected four demonstrations of legitimate emails (banking notifications, identity verification TANs, package tracking, flight gate changes) — all cases where a naive classifier might flag technical-looking content as suspicious. The full optimized instructions for the `classify` predictor:
+The interesting parts are the `instructions` and the `demos`. The optimizer selected four demonstrations of legitimate emails (banking notifications, identity verification TANs, package tracking, flight gate changes). The full optimized instructions for the `classify` predictor:
 
 ```md
-You are an expert cybersecurity email analyst with years of experience in detecting spam, phishing, and legitimate transactional emails. Your task is to carefully analyze the provided email text (plaintext body with HTML as ASCII art), subject, and technical headers to determine its spam risk level.
+You are an expert cybersecurity email analyst specializing in spam and phishing detection. Analyze the provided email content and technical headers to classify the email's spam risk level.
 
-Consider these key factors:
+CRITICAL CONTEXT: The recipient uses an email forwarding setup where legitimate emails are forwarded from Gmail to obfuscated iCloud.com addresses. This means:
 
-- **Content**: Personalization (e.g., name 'Malte Hedderich', specific details like TANs, tracking numbers, passwords, itineraries), formal structure (footers, disclaimers, CTAs), legitimate services (banks like Hanseatic Bank, DHL, PayPal, Netflix), German language, action-oriented subjects, no urgent/scare tactics.
-- **Headers**: SPF results (pass via Google/Amazon relays is good), From/Return-Path/Reply-To (obfuscated like @icloud.com but relayed legitimately), DMARC/DKIM (fails may occur in legit cases), no suspicious mismatches.
+- The From Address may show an iCloud.com domain even for legitimate senders (e.g., DHL, PayPal, Netflix, Lufthansa) due to the forwarding mechanism.
+- DMARC authentication will frequently FAIL because the forwarding causes domain misalignment — this is EXPECTED and NOT a spam indicator in this context.
+- The Return-Path often shows a Gmail address with '+caf\_=' forwarding notation, which is normal for this setup.
+- SPF may pass for Google/Gmail infrastructure rather than the original sender's domain.
 
-Output:
+Do NOT flag these forwarding artifacts as spam indicators. Instead, focus on:
 
-- **Reasons**: A list of specific observations or red flags (e.g., 'SPF fail with mismatched domain', 'generic content without personalization'). For clearly legitimate emails, use an empty list [].
-- **Classification**: Choose exactly one from: 'not_spam' (clearly legitimate transactional), 'unlikely_spam', 'suspicious', 'likely_spam', 'very_likely_spam', 'definitely_spam' (obvious phishing/spam).
+1. **Content analysis**: Does the email body contain phishing attempts, urgency manipulation, suspicious offers, requests for credentials, or deceptive language?
+2. **Sender legitimacy**: Does the email content match what the claimed sender would actually send? (e.g., a DHL tracking notification with a real tracking number is legitimate)
+3. **Contextual coherence**: Is the subject line consistent with the body? Does the email address the recipient by name? Is the language and formatting consistent with the claimed sender?
+4. **True red flags**: Look for mismatched reply-to addresses pointing to unrelated domains, requests for sensitive information, suspicious attachments, or content that doesn't match the sender's typical communications.
 
-Be precise and evidence-based. Legitimate emails often have Gmail return-paths, iCloud From, SPF pass, and personalized details from trusted services.
+Most emails in this system are legitimate German-language transactional emails. Classify conservatively — only escalate the risk level when there are genuine content-based or structural red flags beyond the expected forwarding artifacts. For legitimate emails, return an empty reasons list.
 ```
 
 ### What the Optimizer Found That I Wouldn't Have
 
-Most of the generated instructions align with what I would have written manually. However, one specific rule caught my attention: the optimizer explicitly identified that obfuscated `@icloud.com` addresses relayed via Google or Amazon with passing SPF checks should be treated as legitimate.
-
-I hadn't noticed this pattern myself. It’s a perfect example of how data-driven optimization can surface subtle validation signals that are easily overlooked during manual prompt design.
+Most of the generated instructions align with what I would have written manually. However, the optimizer explicitly identified that obfuscated `@icloud.com` addresses relayed via Google or Amazon with passing SPF checks should be treated as legitimate. It’s a perfect example of how data-driven optimization can surface subtle validation signals that are easily overlooked during manual prompt design.
 
 ### Trying Other LLMs
 
@@ -361,7 +357,7 @@ for name, model_id in models.items():
 
 Each model gets its _own_ optimized instructions and demonstrations, tailored to its particular behavior. A prompt that works brilliantly for Gemini may be suboptimal for Grok, and MIPROv2 accounts for that automatically.
 
-This also makes it easy to re-evaluate whenever a new model drops: add one entry to the `models` dict, run the loop, and compare scores on the same metric and test set. No prompt rewriting required.
+This also makes it easy to re-evaluate whenever a new model drops: add one entry to the `models` dict, run the loop, and compare scores on the same metric and test set.
 
 ## Conclusion
 
