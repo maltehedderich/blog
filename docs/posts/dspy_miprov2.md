@@ -59,7 +59,7 @@ class SpamClassification(dspy.Signature):
 
 class SpamClassifier(dspy.Module):
     def __init__(self):
-        self.classify = dspy.ChainOfThought(SpamClassification)
+        self.classify = dspy.Predict(SpamClassification)
 
     def forward(self, **kwargs):
         return self.classify(**kwargs)
