@@ -13,7 +13,7 @@ draft: false
 
 # Programmatic Prompt Optimization: Building a Spam Filter with DSPy and MIPROv2
 
-Most prompt engineering today is manual and intuition-driven. We tweak wording, rearrange instructions, and evaluate outputs by gut feel. But as LLM applications move from prototypes to production, this approach doesn't scale. What if we could replace intuition with data, optimizing prompts programmatically against measurable metrics just like we tune any other part of a software system?
+Most prompt engineering today is manual and intuition-driven. We tweak wording, rearrange instructions, and evaluate outputs by gut feel. But as LLM applications move from prototypes to production, this approach doesn't scale. What if we could replace intuition with data, optimizing prompts programmatically against measurable metrics similar to how we optimize model weights?
 
 <!-- more -->
 
@@ -202,6 +202,8 @@ MIPROv2 jointly optimizes _instructions_ and _few-shot examples_ for every **pre
 3.  **Bayesian Optimization**: Over a series of trials, MIPROv2 searches for the best _combination_ of instructions and demonstrations (few-shot examples) across all predictors. Each trial evaluates a candidate prompt set against `spam_metric` on a minibatch of the training data, and the best-averaging configuration is periodically validated on the full set.
 
 ```python
+llm_base_url = "https://openrouter.ai/api/v1"
+
 teacher_lm = dspy.LM("openrouter/anthropic/claude-opus-4.6", api_base=llm_base_url, api_key=openrouter_api_key)
 student_lm = dspy.LM("openrouter/x-ai/grok-4.1-fast", api_base=llm_base_url, api_key=openrouter_api_key)
 
